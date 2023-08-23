@@ -16,7 +16,7 @@ def extrairMaiorCtn(img):
         x, y, w, h = cv2.boundingRect(maiorCtn)
         bbox = [x, y, w, h]
         recorte = img[y:y+h, x:x+w]
-        # recorte = cv2.resize(recorte, (400, 500))
+        recorte = cv2.resize(recorte, (400, 500))
         return recorte, bbox
     else:
         return None, None  # Retorna valores nulos quando não há contornos
