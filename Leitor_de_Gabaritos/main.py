@@ -1,6 +1,7 @@
 import os
 import cv2
 import extrairGabarito
+# import proRetangulos
 
 os.system("cls")
 
@@ -8,7 +9,7 @@ opcao1 = [0, 0, 108, 213]
 opcao2 = [90, 80, 213, 318]
 opcao = [opcao1, opcao2]
 
-img = cv2.VideoCapture(0)
+img = cv2.VideoCapture(1)
 
 if img.isOpened():  # Verifica se a webcam está funcionando
     while True:
@@ -30,6 +31,7 @@ if img.isOpened():  # Verifica se a webcam está funcionando
 
             imgTh = imgTh3
 
+            # proRetangulos.proRetangulos(imgTh, gabarito, imgTh)
             # Desenha o retângulo do gabarito
             cv2.rectangle(
                 frame, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
