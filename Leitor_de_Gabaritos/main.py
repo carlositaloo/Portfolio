@@ -15,9 +15,11 @@ if img.isOpened():  # Verifica se a webcam está funcionando
     while True:
         # Captura o frame da webcam
         check, frame = img.read()
+        # Gira o quadro em 90 graus no sentido anti-horário
+        frame90 = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         # Extrai o gabarito da imagem
-        gabarito, bbox = extrairGabarito.extrairMaiorCtn(frame)
+        gabarito, bbox = extrairGabarito.extrairMaiorCtn(frame90)
         if gabarito is not None:
             # Converte a imagem para tons de cinza
             imgCinza = cv2.cvtColor(gabarito, cv2.COLOR_BGR2GRAY)
@@ -29,17 +31,18 @@ if img.isOpened():  # Verifica se a webcam está funcionando
             blurred = cv2.GaussianBlur(imgCinza, (3, 3), 0)
             imgTh3 = cv2.Canny(blurred, 20, 150)
 
-            imgTh = imgTh3
+            imgTh = imgTh2
 
             # proRetangulos.proRetangulos(imgTh, gabarito, imgTh)
             # Desenha o retângulo do gabarito
             cv2.rectangle(
-                frame, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
+                frame90, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
 
+        bloco1, bbox1 = extrairGabarito.extrairMaiorCtn(gabarito)
         # for x, y, w, h in opcao:
-        #     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(gabarito, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        cv2.imshow("Video da Webcam", frame)
+        cv2.imshow("Video da Webcam", frame90)
         cv2.moveWindow("Video da Webcam", 0, 0)
         if gabarito is not None:
             cv2.imshow("Video da Webcam Gabarito", gabarito)
@@ -49,6 +52,6 @@ if img.isOpened():  # Verifica se a webcam está funcionando
         if sair == 27:
             break
 
-    # cv2.imwrite("foto.jpg", frame)
-    img.release()
-    cv2.destroyAllWindows()
+    # cv2.imwrite("foto.jpg", frame90)  # Salva a imagem
+    img.release()                       # Desliga a webcam
+    cv2.destroyAllWindows()             # Fecha todas as janelas cv2
