@@ -1,51 +1,52 @@
 import os
 import cv2
 import extrairGabarito
-# import proRetangulos
 
 os.system("cls")
-
-opcao1 = [0, 0, 108, 213]
-opcao2 = [90, 80, 213, 318]
-opcao = [opcao1, opcao2]
 
 img = cv2.VideoCapture(1)
 
 if img.isOpened():  # Verifica se a webcam está funcionando
     while True:
-        # Captura o frame da webcam
-        check, frame = img.read()
-        # Gira o quadro em 90 graus no sentido anti-horário
+        check, frame = img.read()   # Captura o frame da webcam
+        # Gira o quadro em 90graus
         frame90 = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         # Extrai o gabarito da imagem
         gabarito, bbox = extrairGabarito.extrairMaiorCtn(frame90)
-        if gabarito is not None:
-            # Converte a imagem para tons de cinza
-            imgCinza = cv2.cvtColor(gabarito, cv2.COLOR_BGR2GRAY)
-            # Aplica o filtro de cinza ESCOLHA UMA LINHA OU OUTRA. A PRIMEIRA É MAIS EFICIENTE
-            imgTh1 = cv2.adaptiveThreshold(
-                imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
-            ret, imgTh2 = cv2.threshold(
-                imgCinza, 70, 255, cv2.THRESH_BINARY_INV)
-            blurred = cv2.GaussianBlur(imgCinza, (3, 3), 0)
-            imgTh3 = cv2.Canny(blurred, 20, 150)
+        if gabarito is not None:    # Verifica se o gabarito foi encontrado
+            contorno, bbox2, imgTh4 = extrairGabarito.perspectivaCB(gabarito)
+            if contorno is not None:    # Mostra o que esta sendo identificado como quadrado
+                cv2.drawContours(gabarito, [bbox2], -1, (0, 255, 0), 2)
 
-            imgTh = imgTh2
+                # Converte a imagem para tons de cinza
+                imgCinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
+                # Aplica o filtro de cinza ESCOLHA UMA LINHA OU OUTRA. A PRIMEIRA É MAIS EFICIENTE
+                imgTh1 = cv2.adaptiveThreshold(
+                    imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
+                ret, imgTh2 = cv2.threshold(
+                    imgCinza, 70, 255, cv2.THRESH_BINARY_INV)
+                blurred = cv2.GaussianBlur(imgCinza, (3, 3), 0)
+                imgTh3 = cv2.Canny(blurred, 20, 150)
+                imgTh4 = cv2.threshold(
+                    imgTh4, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
-            # proRetangulos.proRetangulos(imgTh, gabarito, imgTh)
+                imgTh = imgTh1
+                
+                respostas = extrairGabarito.respostas(imgTh4)
+                if respostas is not None:
+                    cv2.drawContours(gabarito, [respostas], -1, (0, 255, 0), 2)
+
             # Desenha o retângulo do gabarito
-            cv2.rectangle(
-                frame90, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
-
-        bloco1, bbox1 = extrairGabarito.extrairMaiorCtn(gabarito)
-        # for x, y, w, h in opcao:
-        # cv2.rectangle(gabarito, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # cv2.rectangle(
+            #     frame90, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
 
         cv2.imshow("Video da Webcam", frame90)
         cv2.moveWindow("Video da Webcam", 0, 0)
-        if gabarito is not None:
-            cv2.imshow("Video da Webcam Gabarito", gabarito)
+        # if gabarito is not None:
+        #     cv2.imshow("Video da Webcam Gabaritos", gabarito)
+        if contorno is not None:
+            cv2.imshow("Video da Webcam Gabarito", contorno)
             cv2.imshow("Video da Webcam Cinza", imgTh)
 
         sair = cv2.waitKey(1)
