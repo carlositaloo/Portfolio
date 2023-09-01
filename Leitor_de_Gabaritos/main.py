@@ -46,7 +46,6 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
                 questaoCnts, gabTh = extrairGabarito.questoes(imgTh)
                 if questaoCnts is not None:
                     for c in questaoCnts:
-                        x, y, w, h = cv2.boundingRect(c)
                         cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
 
             # Desenha o retângulo do gabarito
