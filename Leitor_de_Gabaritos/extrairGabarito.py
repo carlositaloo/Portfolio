@@ -21,7 +21,7 @@ def extrairMaiorCtn(img):
         x, y, w, h = max(x, 0), max(y, 0), max(w, 0), max(h, 0)
         bbox = [x, y, w, h]
         recorte = img[y:y+h, x:x+w]
-        recorte = cv2.resize(recorte, (300, 550))
+        # recorte = cv2.resize(recorte, (300, 550))
         return recorte, bbox
     else:
         return None, None  # Retorna valores nulos quando não há contornos
@@ -46,9 +46,9 @@ def perspectivaCB(img):
                 warped = four_point_transform(cinza, bbox2.reshape(4, 2))
                 corte = cv2.resize(corte, (300, 550))
     if bbox2 is not None:
-        return corte, bbox2, warped
+        return corte, bbox2
     else:
-        return None, None, None
+        return None, None
 
 def questoes(gabTh):
     # gabTh = cv2.threshold(gabTh, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
@@ -58,6 +58,6 @@ def questoes(gabTh):
     for c in cnts:
         (x, y, w, h) = cv2.boundingRect(c)
         ar = w / float(h)
-        if w >= 20 and h >= 20 and ar >= 0.9 and ar <= 1.1:
+        if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
             questaoCnts.append(c)
-    return questaoCnts, gabTh
+    return questaoCnts
