@@ -6,6 +6,7 @@ os.system("cls")
 
 
 usar_webcam = False  # Defina como True para usar a webcam
+questoes = []
 
 if usar_webcam:
     # Inicialize a captura de vídeo a partir da webcam (0 é geralmente a câmera padrão)
@@ -27,9 +28,9 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
         # Extrai o gabarito da imagem
         gabarito, bbox = extrairGabarito.extrairMaiorCtn(frame)
         if gabarito is not None:    # Verifica se o gabarito foi encontrado
-            contorno, bbox2, gabTh = extrairGabarito.perspectivaCB(gabarito)
+            contorno, bbox2 = extrairGabarito.perspectivaCB(gabarito)
             if contorno is not None:    # Mostra o que esta sendo identificado como quadrado
-                cv2.drawContours(gabarito, [bbox2], -1, (255, 0, 0), 2)
+                # cv2.drawContours(gabarito, [bbox2], -1, (255, 0, 0), 2)
 
                 # Converte a imagem para tons de cinza
                 imgCinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
@@ -43,14 +44,23 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
 
                 imgTh = imgTh1
 
-                questaoCnts, gabTh = extrairGabarito.questoes(imgTh)
-                if questaoCnts is not None:
-                    for c in questaoCnts:
-                        cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
+                questaoCnts = extrairGabarito.questoes(imgTh)
+                # print(questaoCnts)
+                # if questaoCnts is not None:
+                #     for c in questaoCnts:
+                #         cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
+                
+                
+                registrar = cv2.waitKey(13)
+                if registrar == 13:
+                    
+                    # print(questoes)
+                    for c in questoes:
+                        cv2.drawContours(contorno, c, -1, (0, 0, 255), 2)
 
             # Desenha o retângulo do gabarito
             # cv2.rectangle(
-            #     frame, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
+                # frame, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
 
         cv2.imshow("Video da Webcam", frame)
         cv2.moveWindow("Video da Webcam", 0, 0)
@@ -58,7 +68,7 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
         # cv2.imshow("Video da Webcam Gabaritos", gabarito)
         if contorno is not None:
             cv2.imshow("Video da Webcam Gabarito", contorno)
-            cv2.imshow("Video da Webcam Cinza", gabTh)
+            cv2.imshow("Video da Webcam Cinza", imgTh)
 
         sair = cv2.waitKey(1)
         if sair == 27:
