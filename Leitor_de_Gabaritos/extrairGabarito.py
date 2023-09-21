@@ -25,16 +25,18 @@ def extrairMaiorCtn(img):
         return recorte, bbox
     else:
         return None, None  # Retorna valores nulos quando não há contornos
-    
+
+
 def perspectivaCB(img):
     cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(cinza, (5, 5), 0)
     edged = cv2.Canny(blurred, 75, 200)
-    
-    cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    cnts = cv2.findContours(
+        edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     bbox2 = None
-    
+
     if len(cnts) > 0:
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
         for c in cnts:
@@ -50,14 +52,24 @@ def perspectivaCB(img):
     else:
         return None, None
 
-def questoes(gabTh):
+
+def questoes(gabTh, tipoGabarito):
     # gabTh = cv2.threshold(gabTh, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-    cnts = cv2.findContours(gabTh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(
+        gabTh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     questaoCnts = []
-    for c in cnts:
-        (x, y, w, h) = cv2.boundingRect(c)
-        ar = w / float(h)
-        if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
-            questaoCnts.append(c)
-    return questaoCnts
+    if tipoGabarito == True:
+        for c in cnts:
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+            if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
+                questaoCnts.append(c)
+        return questaoCnts
+    else:
+        for c in cnts:
+            (x, y, w, h) = cv2.boundingRect(c)
+            ar = w / float(h)
+            if w >= 6 and h >= 6 and ar >= 0.0 and ar <= 9.3:
+                questaoCnts.append(c)
+        return questaoCnts
