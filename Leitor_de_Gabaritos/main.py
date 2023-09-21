@@ -1,23 +1,26 @@
 import os
 import cv2
+import pickle
 import extrairGabarito
 
 os.system("cls")
 
 
-usar_webcam = False  # Defina como True para usar a webcam
+usar_webcam = True  # Defina como True para usar a webcam
 questoes = []
+tipoGabarito = True   # True para gabarito de bolhas, False para gabarito de quadrados
 
 if usar_webcam:
     # Inicialize a captura de vídeo a partir da webcam (0 é geralmente a câmera padrão)
     captura = cv2.VideoCapture(1)
 else:
     # Carregue a imagem estática
-    imagem_caminho = 'gabarito2.png'
+    imagem_caminho = 'gabarito.png'
     img = cv2.imread(imagem_caminho)
 
 if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None):
     while True:
+        tecla = cv2.waitKey(1)
         if usar_webcam:
             check, frame = captura.read()   # Captura o frame da webcam
             # Rotaciona o frame
@@ -44,19 +47,19 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
 
                 imgTh = imgTh1
 
-                questaoCnts = extrairGabarito.questoes(imgTh)
-                # print(questaoCnts)
-                # if questaoCnts is not None:
-                #     for c in questaoCnts:
-                #         cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
-                
-                
-                registrar = cv2.waitKey(13)
-                if registrar == 13:
-                    
-                    # print(questoes)
-                    for c in questoes:
-                        cv2.drawContours(contorno, c, -1, (0, 0, 255), 2)
+                questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
+                print(questaoCnts)
+                if questaoCnts is not None:
+                    for c in questaoCnts:
+                        cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
+
+                # with open('questoes.pkl', 'rb') as arquivo:
+                #     questoes = pickle.load(arquivo)
+
+                # if tecla == 13:
+                #     print(questoes)
+                # for c in questoes:
+                #     cv2.drawContours(contorno, [c], -1, (0, 0, 255), 2)
 
             # Desenha o retângulo do gabarito
             # cv2.rectangle(
@@ -70,8 +73,10 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
             cv2.imshow("Video da Webcam Gabarito", contorno)
             cv2.imshow("Video da Webcam Cinza", imgTh)
 
-        sair = cv2.waitKey(1)
-        if sair == 27:
+        if tecla == 27:
+            print('Saindo...')
+            # with open('questoes.pkl', 'wb') as arquivo:
+            # pickle.dump(questoes, arquivo)
             break
 
     # cv2.imwrite("foto.jpg", frame)  # Salva a imagem
