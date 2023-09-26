@@ -4,14 +4,12 @@ import imutils
 from imutils.perspective import four_point_transform
 
 
-def extrairMaiorCtn(img):
-    imgCinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    imgTh = cv2.adaptiveThreshold(
-        imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 12)
+def extrairMaiorCtn(frame):
+    imgCinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    imgTh = cv2.adaptiveThreshold(imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 12)
     kernel = np.ones((2, 2), np.uint8)
     imgDil = cv2.dilate(imgTh, kernel)
-    contours, _ = cv2.findContours(
-        imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     if contours:  # Verifica se a lista de contornos não está vazia
         maiorCtn = max(contours, key=cv2.contourArea)
@@ -20,20 +18,19 @@ def extrairMaiorCtn(img):
         x, y, w, h = x - margin, y - margin, w + 2 * margin, h + 2 * margin
         x, y, w, h = max(x, 0), max(y, 0), max(w, 0), max(h, 0)
         bbox = [x, y, w, h]
-        recorte = img[y:y+h, x:x+w]
+        recorte = frame[y:y+h, x:x+w]
         # recorte = cv2.resize(recorte, (300, 550))
         return recorte, bbox
     else:
         return None, None  # Retorna valores nulos quando não há contornos
 
 
-def perspectivaCB(img):
+def perspectivaCB(img): # aplicar uma transformação de perspectiva ao exame, obtendo uma visão de cima para baixo.
     cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(cinza, (5, 5), 0)
     edged = cv2.Canny(blurred, 75, 200)
 
-    cnts = cv2.findContours(
-        edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     bbox2 = None
 
