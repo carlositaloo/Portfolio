@@ -1,6 +1,8 @@
 import os
 import cv2
 import pickle
+import numpy as np
+from imutils import contours
 import extrairGabarito
 
 os.system("cls")
@@ -51,7 +53,14 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
                 imgTh_copy = imgTh.copy()
 
                 questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
-                print(questaoCnts)
+                # print(questaoCnts)
+                
+                questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
+                correto = 0
+                for (q, i) in enumerate(np.arange(0, len(questaoCnts), 5)):
+                    cnts = contours.sort_contours(questaoCnts[i:i + 5])[0]
+                    bubbled = None
+                    
                 if questaoCnts is not None:
                     for c in questaoCnts:
                         cv2.drawContours(contorno_copy, [c], -1, (0, 255, 0), 2)
@@ -62,7 +71,7 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
                 # if tecla == 13:
                 #     print(questoes)
                 # for c in questoes:
-                #     cv2.drawContours(contorno, [c], -1, (0, 0, 255), 2)
+                #     cv2.drawContours(contorno_copy, [c], -1, (0, 0, 255), 2)
 
             # Desenha o retângulo do gabarito
             # cv2.rectangle(
@@ -70,12 +79,11 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
 
         cv2.imshow("Video da Webcam", frame_copy)
         cv2.moveWindow("Video da Webcam", 0, 0)
-        # if gabarito is not None:
-        # cv2.imshow("Video da Webcam Gabaritos", gabarito)
+
         if contorno is not None:
             cv2.imshow("Video da Webcam Gabarito", contorno_copy)
             cv2.imshow("Video da Webcam Cinza", imgTh_copy)
-            cv2.imshow("Video da zoomGabarito", zoomGabarito)
+            # cv2.imshow("Video da zoomGabarito", zoomGabarito)
 
         if tecla == 27:
             print('Saindo...')
