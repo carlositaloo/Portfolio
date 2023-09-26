@@ -6,16 +6,16 @@ import extrairGabarito
 os.system("cls")
 
 
-usar_webcam = True  # Defina como True para usar a webcam
-questoes = []
+usar_webcam = False  # Defina como True para usar a webcam
 tipoGabarito = True   # True para gabarito de bolhas, False para gabarito de quadrados
+questoes = []
 
 if usar_webcam:
     # Inicialize a captura de vídeo a partir da webcam (0 é geralmente a câmera padrão)
     captura = cv2.VideoCapture(1)
 else:
     # Carregue a imagem estática
-    imagem_caminho = 'gabarito.png'
+    imagem_caminho = 'gabarito2.png'
     img = cv2.imread(imagem_caminho)
 
 if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None):
@@ -29,11 +29,13 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
             frame = img  # Usar a imagem estática
 
         # Extrai o gabarito da imagem
-        gabarito, bbox = extrairGabarito.extrairMaiorCtn(frame)
-        if gabarito is not None:    # Verifica se o gabarito foi encontrado
-            contorno, bbox2 = extrairGabarito.perspectivaCB(gabarito)
+        zoomGabarito, bbox = extrairGabarito.extrairMaiorCtn(frame)
+        if zoomGabarito is not None:    # Verifica se o gabarito foi encontrado
+            contorno, bbox2 = extrairGabarito.perspectivaCB(zoomGabarito)
             if contorno is not None:    # Mostra o que esta sendo identificado como quadrado
-                # cv2.drawContours(gabarito, [bbox2], -1, (255, 0, 0), 2)
+                frame_copy = frame.copy()
+                contorno_copy = contorno.copy()
+                cv2.drawContours(frame_copy, [bbox2], -1, (255, 0, 0), 2)
 
                 # Converte a imagem para tons de cinza
                 imgCinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
@@ -46,12 +48,13 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
                 imgTh3 = cv2.Canny(blurred, 20, 150)
 
                 imgTh = imgTh1
+                imgTh_copy = imgTh.copy()
 
                 questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
                 print(questaoCnts)
                 if questaoCnts is not None:
                     for c in questaoCnts:
-                        cv2.drawContours(contorno, [c], -1, (0, 255, 0), 2)
+                        cv2.drawContours(contorno_copy, [c], -1, (0, 255, 0), 2)
 
                 # with open('questoes.pkl', 'rb') as arquivo:
                 #     questoes = pickle.load(arquivo)
@@ -65,13 +68,14 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
             # cv2.rectangle(
                 # frame, (bbox[0], bbox[1]), (bbox[0] + bbox[2], bbox[1] + bbox[3]), (255, 0, 0), 3)
 
-        cv2.imshow("Video da Webcam", frame)
+        cv2.imshow("Video da Webcam", frame_copy)
         cv2.moveWindow("Video da Webcam", 0, 0)
         # if gabarito is not None:
         # cv2.imshow("Video da Webcam Gabaritos", gabarito)
         if contorno is not None:
-            cv2.imshow("Video da Webcam Gabarito", contorno)
-            cv2.imshow("Video da Webcam Cinza", imgTh)
+            cv2.imshow("Video da Webcam Gabarito", contorno_copy)
+            cv2.imshow("Video da Webcam Cinza", imgTh_copy)
+            cv2.imshow("Video da zoomGabarito", zoomGabarito)
 
         if tecla == 27:
             print('Saindo...')
