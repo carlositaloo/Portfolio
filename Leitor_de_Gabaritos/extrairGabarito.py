@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import imutils
 from imutils.perspective import four_point_transform
+from imutils import contours
 
 
 def extrairMaiorCtn(frame):
@@ -62,11 +63,16 @@ def questoes(gabTh, tipoGabarito):
             ar = w / float(h)
             if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
                 questaoCnts.append(c)
-        return questaoCnts
     else:
         for c in cnts:
             (x, y, w, h) = cv2.boundingRect(c)
             ar = w / float(h)
             if w >= 6 and h >= 6 and ar >= 0.0 and ar <= 9.3:
                 questaoCnts.append(c)
-        return questaoCnts
+                
+    questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
+    correto = 0
+    for (q, i) in enumerate(np.arange(0, len(questaoCnts), 4)):
+        cnts = contours.sort_contours(questaoCnts[i:i + 4])[0]
+        bubbled = None
+    return questaoCnts
