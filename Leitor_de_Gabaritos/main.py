@@ -1,8 +1,6 @@
 import os
 import cv2
 import pickle
-import numpy as np
-from imutils import contours
 import extrairGabarito
 
 os.system("cls")
@@ -54,12 +52,6 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
 
                 questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
                 # print(questaoCnts)
-                
-                questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
-                correto = 0
-                for (q, i) in enumerate(np.arange(0, len(questaoCnts), 5)):
-                    cnts = contours.sort_contours(questaoCnts[i:i + 5])[0]
-                    bubbled = None
                     
                 if questaoCnts is not None:
                     for c in questaoCnts:
