@@ -3,6 +3,7 @@ import numpy as np
 import imutils
 from imutils.perspective import four_point_transform
 from imutils import contours
+from skimage.filters import threshold_local
 
 
 def extrairMaiorCtn(frame):
@@ -44,6 +45,8 @@ def perspectivaCB(img): # aplicar uma transformação de perspectiva ao exame, o
                 bbox2 = approx
                 corte = four_point_transform(img, bbox2.reshape(4, 2))
                 warped = four_point_transform(cinza, bbox2.reshape(4, 2))
+                # T = threshold_local(warped, 11, offset = 10, method = "gaussian")
+                # warped = (warped > T).astype("uint8") * 255
                 corte = cv2.resize(corte, (300, 550))
     if bbox2 is not None:
         return corte, bbox2
