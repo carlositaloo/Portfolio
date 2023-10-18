@@ -67,11 +67,19 @@ def questoes(gabTh, tipoGabarito):
             if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
                 questaoCnts.append(c)
     else:
+        questionCnts = []
+        peri = 0.02 * cv2.arcLength(c, True)
+
         for c in cnts:
+            tamanho = thresh.shape[1]/5 
             (x, y, w, h) = cv2.boundingRect(c)
             ar = w / float(h)
-            if w >= 6 and h >= 6 and ar >= 0.0 and ar <= 9.3:
-                questaoCnts.append(c)
+            approx = cv2.approxPolyDP(c, peri, True)
+            if (w<=tamanho and h < tamanho) and (ar>=1.6 and ar<=2.6) and (w>tamanho/10 and h>tamanho/10) :
+                questionCnts.append(c)
+            print(len(questionCnts))
+            if len(questionCnts) == 50:
+                break
                 
     questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
     correto = 0
