@@ -6,7 +6,7 @@ import extrairGabarito
 os.system("cls")
 
 
-usar_webcam = False  # Defina como True para usar a webcam
+usar_webcam = True  # Defina como True para usar a webcam
 tipoGabarito = True   # True para gabarito de bolhas, False para gabarito de quadrados
 questoes = []
 
@@ -52,10 +52,11 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
 
                 questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
                 # print(questaoCnts)
-                    
+
                 if questaoCnts is not None:
                     for c in questaoCnts:
-                        cv2.drawContours(contorno_copy, [c], -1, (0, 255, 0), 2)
+                        cv2.drawContours(
+                            contorno_copy, [c], -1, (0, 255, 0), 2)
 
                 # with open('questoes.pkl', 'rb') as arquivo:
                 #     questoes = pickle.load(arquivo)
