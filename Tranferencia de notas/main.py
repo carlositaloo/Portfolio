@@ -10,7 +10,7 @@ print("Em execução...")
 def executar_meu_script():
     try:
         # Substitua "caminho_para_seu_script.py" pelo caminho real do seu script
-        processo = subprocess.Popen(["python", "script.py"])
+        processo = subprocess.Popen(["python", "script2.py"])
         processo.wait()  # Aguarda até que o processo termine
     except Exception as e:
         print(f"Erro ao executar o script: {e}")
