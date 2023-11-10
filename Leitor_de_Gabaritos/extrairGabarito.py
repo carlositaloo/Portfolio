@@ -54,36 +54,20 @@ def perspectivaCB(img): # aplicar uma transformação de perspectiva ao exame, o
         return None, None
 
 
-def questoes(gabTh, tipoGabarito):
+def questoes(gabTh):
     # gabTh = cv2.threshold(gabTh, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-    cnts = cv2.findContours(
-        gabTh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cv2.findContours(gabTh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     questaoCnts = []
-    if tipoGabarito == True:
-        for c in cnts:
-            (x, y, w, h) = cv2.boundingRect(c)
-            ar = w / float(h)
-            if w >= 13 and h >= 13 and ar >= 0.9 and ar <= 3.3:
-                questaoCnts.append(c)
-    else:
-        questionCnts = []
-        peri = 0.02 * cv2.arcLength(c, True)
-
-        for c in cnts:
-            tamanho = thresh.shape[1]/5 
-            (x, y, w, h) = cv2.boundingRect(c)
-            ar = w / float(h)
-            approx = cv2.approxPolyDP(c, peri, True)
-            if (w<=tamanho and h < tamanho) and (ar>=1.6 and ar<=2.6) and (w>tamanho/10 and h>tamanho/10) :
-                questionCnts.append(c)
-            print(len(questionCnts))
-            if len(questionCnts) == 50:
-                break
-                
-    questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
-    correto = 0
-    for (q, i) in enumerate(np.arange(0, len(questaoCnts), 4)):
-        cnts = contours.sort_contours(questaoCnts[i:i + 4])[0]
-        bubbled = None
+    for c in cnts:
+        (x, y, w, h) = cv2.boundingRect(c)
+        ar = w / float(h)
+        if w >= 13 and h >= 13 and ar >= 0.1 and ar <= 3.3:
+            questaoCnts.append(c)
+    
+    # questaoCnts = contours.sort_contours(questaoCnts,method="top-to-bottom")[0]
+    # correto = 0
+    # for (q, i) in enumerate(np.arange(0, len(questaoCnts), 4)):
+    #     cnts = contours.sort_contours(questaoCnts[i:i + 4])[0]
+    #     bubbled = None
     return questaoCnts
