@@ -6,8 +6,8 @@ import extrairGabarito
 os.system("cls")
 
 
-usar_webcam = True  # Defina como True para usar a webcam
-tipoGabarito = True   # True para gabarito de bolhas, False para gabarito de quadrados
+# Defina como True para usar a webcam ou False para usar uma imagem estática
+usar_webcam = True
 questoes = []
 
 if usar_webcam:
@@ -15,7 +15,7 @@ if usar_webcam:
     captura = cv2.VideoCapture(1)
 else:
     # Carregue a imagem estática
-    imagem_caminho = 'gabarito2.png'
+    imagem_caminho = 'image/gabarito2.png'
     img = cv2.imread(imagem_caminho)
 
 if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None):
@@ -50,7 +50,7 @@ if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None)
                 imgTh = imgTh1
                 imgTh_copy = imgTh.copy()
 
-                questaoCnts = extrairGabarito.questoes(imgTh, tipoGabarito)
+                questaoCnts = extrairGabarito.questoes(imgTh)
                 # print(questaoCnts)
 
                 if questaoCnts is not None:
