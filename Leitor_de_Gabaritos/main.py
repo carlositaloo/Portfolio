@@ -7,7 +7,7 @@ os.system("cls")
 
 
 # Defina como True para usar a webcam ou False para usar uma imagem estática
-usar_webcam = True
+usar_webcam = False
 questoes = []
 
 if usar_webcam:
