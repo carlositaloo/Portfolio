@@ -1,12 +1,13 @@
 from PIL import Image
 from pillow_heif import register_heif_opener
+from tqdm import tqdm
 import os
 import shutil
 
 # Registra o manipulador HEIC no Pillow
 register_heif_opener()
 
-os.system('cls')
+# os.system('cls')
 
 # Diretórios de origem e destino
 dir_origem = "img-cru"
@@ -19,7 +20,7 @@ if not os.path.exists(dir_destino):
 
 lista_arquivos = os.listdir(dir_origem)
 
-for img in lista_arquivos:
+for img in tqdm(lista_arquivos):
     caminho_origem = os.path.join(dir_origem, img)
 
     # Verifica se o arquivo é HEIC
