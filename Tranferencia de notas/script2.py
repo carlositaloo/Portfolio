@@ -1,3 +1,4 @@
+# Transferencia de notas para declarações de 9º ano
 import pyperclip
 import pyautogui
 
