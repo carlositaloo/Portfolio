@@ -27,8 +27,8 @@ Ingles = valores[6]
 Portugues = valores[7]
 Matematica = valores[8]
 
-variaveis = [Portugues, Ingles, Edufisica, Artes, Matematica, Ciencias, Historia, Geografia, Religiao]
-
+# variaveis = [Portugues, Ingles, Edufisica, Artes, Matematica, Ciencias, Historia, Geografia, Religiao]
+variaveis = [Portugues, Matematica, Historia, Geografia, Ciencias, Artes, Religiao, Ingles, Edufisica]
 # pyautogui.click(761, 880, duration=0.25)
 pyautogui.press('esc')
 
