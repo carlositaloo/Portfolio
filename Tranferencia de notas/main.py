@@ -1,21 +1,31 @@
 import subprocess
-import sys
 import pyautogui
 import os
+import pystray
+from PIL import Image
 from pynput.keyboard import Key, Listener
 
+os.system('cls')
 print("Em execução...")
+img_icon = Image.open("icon.png")
+rodada = 0
+processo = None
 
-# Defina a função que será executada quando a tecla F8 for pressionada
+def sair_do_programa():
+    global processo  # Declare processo como global
+    if processo:
+        print("Encerrando o programa...")
+        processo.kill()
+    icon.stop()
+    os._exit(0)
+
 def executar_meu_script():
+    global processo  # Declare processo como global
     try:
-        # Substitua "caminho_para_seu_script.py" pelo caminho real do seu script
         processo = subprocess.Popen(["python", "script2.py"])
         processo.wait()  # Aguarda até que o processo termine
     except Exception as e:
         print(f"Erro ao executar o script: {e}")
-
-rodada = 1
 
 # Função para verificar se a tecla F8 foi pressionada
 def cola_nota(key):
@@ -24,14 +34,16 @@ def cola_nota(key):
         os.system('cls')
         print("Executando o script...")
         executar_meu_script()
-        rodada += 1
-        for c in range(13 if rodada % 2 == 0 else 15):
-            pyautogui.press('down')
-    elif key == Key.esc:
-        print("Script cancelado.")
-        sys.exit(0)
+        # rodada += 1
+        # for c in range(13 if rodada % 2 == 0 else 15):
+        #     pyautogui.press('down')
 
-# Configurar o listener de teclado 1 2 8
-with Listener(on_press=cola_nota) as test:
-    test.join()
+icon = pystray.Icon("Copy nota", img_icon, menu=pystray.Menu(
+    pystray.MenuItem("Quit", sair_do_programa)
+))
+
+# Configurar o listener de teclado
+with Listener(on_press=cola_nota) as listener:
+    icon.run()
+    listener.join()
 
