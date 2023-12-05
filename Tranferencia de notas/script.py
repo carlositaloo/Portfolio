@@ -1,3 +1,4 @@
+# Transferencia de notas para livro de notas
 import os
 import pyperclip
 import pyautogui
