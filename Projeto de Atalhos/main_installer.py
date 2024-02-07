@@ -1,3 +1,5 @@
+# pyinstaller --onefile --noconsole --icon=icon.ico --add-data "icon.png;." main_installer.py
+
 from os import _exit
 from subprocess import Popen
 from pynput.keyboard import Key, Listener
@@ -10,7 +12,7 @@ import pystray
 # Códigos de teclas
 tecla_calculadora = Key.num_lock
 tecla_notepad = 111  # Código da tecla 'notepad'
-tecla_ponto = 194  # Código da tecla '.'
+tecla_ponto = 161  # Código da tecla '.'
 
 # Configurações
 limite_pressionamentos = 2
