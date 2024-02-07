@@ -1,6 +1,8 @@
 # pyinstaller --onefile --noconsole --icon=icon.ico --add-data "icon.png;." main_installer.py
+# pyinstaller --onefile --noconsole --icon=icon.ico --add-binary "icon.png;." main_installer.py
 
-from os import _exit
+import sys
+import os
 from subprocess import Popen
 from pynput.keyboard import Key, Listener
 from PIL import Image
@@ -72,8 +74,14 @@ def sair_do_programa(icon, item):
     icon.stop()
     _exit(0)
 
-# Carregamento do ícone
-img_icon = Image.open("icon.png")
+# Obter o caminho para os recursos temporários do executável
+exe_path = sys._MEIPASS
+
+# Construir o caminho para o arquivo icon.png dentro dos recursos temporários
+icon_path = os.path.join(exe_path, "icon.png")
+
+# Abrir o arquivo icon.png
+img_icon = Image.open(icon_path)
 
 # Configuração do ícone na bandeja do sistema
 icon = pystray.Icon("Copy nota", img_icon, menu=pystray.Menu(
