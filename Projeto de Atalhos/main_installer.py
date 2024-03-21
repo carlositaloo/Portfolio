@@ -13,8 +13,8 @@ import pystray
 
 # Códigos de teclas
 tecla_calculadora = Key.num_lock
-tecla_notepad = 111  # Código da tecla 'notepad'
-tecla_ponto = 161  # Código da tecla '.'
+tecla_notepad = Key.menu
+tecla_porcentagem = Key.shift_r  # Tecla para fazer divisão
 
 # Configurações
 limite_pressionamentos = 2
@@ -38,10 +38,10 @@ def abrir_aplicativo(nome_aplicativo, pressionamentos, app_aberto):
 def ao_pressionar(key):
     global pressionamentos, ultimo_tempo, tecla_pressionada, app_aberto
 
-    try:
-        codigo_tecla_press = key.vk
-    except AttributeError:
-        codigo_tecla_press = key.value.vk
+    # try:
+    #     codigo_tecla_press = key.vk
+    # except AttributeError:
+    #     codigo_tecla_press = key.value.vk
 
     if not tecla_pressionada:
         tecla_pressionada = True
@@ -56,12 +56,16 @@ def ao_pressionar(key):
 
         if key == tecla_calculadora:
             app_aberto = abrir_aplicativo("calc.exe", pressionamentos, app_aberto)
-        elif codigo_tecla_press == tecla_notepad:
+        elif key == tecla_notepad:
             app_aberto = abrir_aplicativo("notepad.exe", pressionamentos, app_aberto)
+
             
-    if codigo_tecla_press == tecla_ponto:
+    if key == tecla_porcentagem:
         if getActiveWindow().title == "Calculadora":
-            send('shift+5')
+            send('shift+5', do_press=True, do_release=True)
+
+# elif codigo_tecla_press == tecla_notepad:
+#     app_aberto = abrir_aplicativo("notepad.exe", pressionamentos, app_aberto)
 
 # Função de callback para quando uma tecla é solta
 def ao_soltar(key):
@@ -70,12 +74,17 @@ def ao_soltar(key):
     app_aberto = False
 
 # Função para sair do programa
-def sair_do_programa(icon, item):
+def sair_do_programa(icon):
     icon.stop()
-    _exit(0)
+    os._exit(0)  # Força a saída do programa
 
-# Obter o caminho para os recursos temporários do executável
-exe_path = sys._MEIPASS
+# Verificar se o script está sendo executado como um executável compilado pelo pyinstaller
+if getattr(sys, 'frozen', False):
+    # Se estiver sendo executado como um executável, use o atributo _MEIPASS
+    exe_path = sys._MEIPASS
+else:
+    # Se estiver sendo executado como um script Python, use o diretório atual
+    exe_path = os.path.dirname(os.path.abspath(__file__))
 
 # Construir o caminho para o arquivo icon.png dentro dos recursos temporários
 icon_path = os.path.join(exe_path, "icon.png")
