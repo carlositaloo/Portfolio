@@ -1,5 +1,5 @@
-# pyinstaller --onefile --noconsole --icon=icon.ico --add-data "icon.png;." main_installer.py
-# pyinstaller --onefile --noconsole --icon=icon.ico --add-binary "icon.png;." main_installer.py
+# pyinstaller --onefile --noconsole --icon=icon.ico --add-data "icon.png;." main_atalhos.py --clean
+# pyinstaller --onefile --noconsole --icon=icon.ico --add-binary "icon.png;." main_installer.py --clean
 
 import sys
 import os
@@ -14,6 +14,7 @@ import pystray
 # Códigos de teclas
 tecla_calculadora = Key.num_lock
 tecla_notepad = Key.menu
+tecla_terminal = Key.home
 tecla_porcentagem = Key.shift_r  # Tecla para fazer divisão
 
 # Configurações
@@ -29,9 +30,15 @@ tecla_pressionada = False
 # Função para abrir um aplicativo
 def abrir_aplicativo(nome_aplicativo, pressionamentos, app_aberto):
     if pressionamentos >= limite_pressionamentos and not app_aberto:
-        Popen([nome_aplicativo])
-        sleep(2)
-        return True
+        if nome_aplicativo == "WindowsTerminal":
+            WindowsTerminal = r"C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.19.10573.0_x64__8wekyb3d8bbwe\WindowsTerminal.exe"
+            os.startfile(WindowsTerminal)
+            sleep(2)
+            return True
+        else:
+            Popen([nome_aplicativo])
+            sleep(2)
+            return True
     return False
 
 # Função de callback para quando uma tecla é pressionada
@@ -58,6 +65,8 @@ def ao_pressionar(key):
             app_aberto = abrir_aplicativo("calc.exe", pressionamentos, app_aberto)
         elif key == tecla_notepad:
             app_aberto = abrir_aplicativo("notepad.exe", pressionamentos, app_aberto)
+        elif key == tecla_terminal:
+            app_aberto = abrir_aplicativo("WindowsTerminal", pressionamentos, app_aberto)
 
             
     if key == tecla_porcentagem:
