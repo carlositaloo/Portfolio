@@ -1,5 +1,5 @@
 # pyinstaller --onefile --noconsole --icon=icon.ico --add-data "icon.png;." main_atalhos.py --clean
-# pyinstaller --onefile --noconsole --icon=icon.ico --add-binary "icon.png;." main_installer.py --clean
+# pyinstaller --onefile --noconsole --icon=icon.ico --add-binary "icon.png;." main_atalhos.py --clean
 
 import sys
 import os
