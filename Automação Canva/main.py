@@ -7,11 +7,13 @@ from time import sleep
 
 os.system('cls')
 
-# Digite
+# Configurações
 # 1 para criar designs a partir de um design já existente
 # 2 para alterar o texto de designs já existentes
 # 3 para alterar o texto de designs já existentes com dois textos
-tipo_design = 1
+tipo_design = 3
+navegadorxy = 722, 882  # Coordenadas do botão do navegador
+foralayout = 1403, 187  # Coordenadas fora do layout
 
 path_clone = 'img/clone.png'
 path_texto = 'img/texto.png'
@@ -65,7 +67,7 @@ def criar_designs(coluna1):
         return
 
     # Clicar no botão do navegador *Defina as coordenadas*
-    pyautogui.click(697, 880)  # Clicar no botão do navegador
+    pyautogui.click(navegadorxy)  # Clicar no botão do navegador
     pyautogui.PAUSE = 0.4
     coluna1.sort(key=str.upper)   # Ordenar a coluna1 em ordem alfabética
     # Iterar sobre a coluna1
@@ -75,16 +77,12 @@ def criar_designs(coluna1):
         print(f"{indice}. {nome}")
         pyperclip.copy(nome)
 
-        # pyautogui.click(452,191)
-        pyautogui.press('PageUp', presses=3)    # Subir a página
-        # Procurar o botão de clone
         path = list(pyautogui.locateAllOnScreen(path_clone, confidence=0.9))
         # Pegar o centro do botão e armazena em x e y
         x, y = pyautogui.center(path[0])
         pyautogui.click(x, y)   # Clicar no botão de clone
 
-        pyautogui.click(452, 191)   # Clicar fora do layout
-        sleep(0.5)
+        pyautogui.click(foralayout)   # Clicar fora do layout
         pyautogui.press('PageUp', presses=3)    # Subir a página
 
         # Procurar o campo de texto
@@ -95,7 +93,7 @@ def criar_designs(coluna1):
         pyautogui.doubleClick(x, y)  # Clicar duas vezes no campo de texto
         pyautogui.hotkey('ctrl', 'a')   # Selecionar o texto
         pyautogui.hotkey('ctrl', 'v')   # Colar o texto
-    pyautogui.click(1404, 597)   # Clicar fora do layout
+    pyautogui.click(foralayout)   # Clicar fora do layout
 
     # Essa função apenas altera o texto dos designs já existentes
 
@@ -105,7 +103,7 @@ def designs_existentes(coluna1, coluna2):
         return
 
     # Clicar no botão do navegador *Defina as coordenadas*
-    pyautogui.click(697, 880)  # Clicar no botão do navegador
+    pyautogui.click(navegadorxy)  # Clicar no botão do navegador
     pyautogui.PAUSE = 0.4
     # Iterar sobre a coluna1
     # for indice, (nome1, nome2) in enumerate(zip(coluna1, coluna2 or []), start=1):
@@ -128,7 +126,7 @@ def designs_existentes(coluna1, coluna2):
         pyautogui.doubleClick(x, y)  # Clicar duas vezes no campo de texto
         pyautogui.hotkey('ctrl', 'a')   # Selecionar o texto
         pyautogui.hotkey('ctrl', 'v')   # Colar o texto
-        pyautogui.click(452, 191)   # Clicar fora do layout
+        pyautogui.click(foralayout)   # Clicar fora do layout
 
         if tipo_design == 3:
             pyperclip.copy(nome2)
@@ -141,10 +139,10 @@ def designs_existentes(coluna1, coluna2):
             pyautogui.doubleClick(x, y)  # Clicar duas vezes no campo de texto
             pyautogui.hotkey('ctrl', 'a')   # Selecionar o texto
             pyautogui.hotkey('ctrl', 'v')   # Colar o texto
-            pyautogui.click(452, 191)   # Clicar fora do layout
+            pyautogui.click(foralayout)   # Clicar fora do layout
 
         pyautogui.press('PageDown', presses=1)    # Vai para o próximo design
-    pyautogui.click(1404, 597)   # Clicar fora do layout
+    pyautogui.click(foralayout)   # Clicar fora do layout
 
 
 # Executando o script e imprimindo os nomes
