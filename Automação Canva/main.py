@@ -6,10 +6,10 @@ from pynput import keyboard
 from time import sleep
 
 # Configurações
-fazer_clone = False     # Se deve criar clone
-num_textos = 1          # Quantos textos vai modificar
+fazer_clone = True     # Se deve criar clone
+num_textos = 8          # Quantos textos vai modificar
 num_coluna = 0          # Coluna inicial no Excel '0 = Default'
-path_textos = ['img/texto.png', 'img/texto1.png', 'img/texto2.png', 'img/texto3.png']
+path_textos = ['img/texto1.png', 'img/texto2.png', 'img/texto3.png', 'img/texto4.png', 'img/texto5.png', 'img/texto6.png', 'img/texto7.png', 'img/texto8.png']
 
 navegadorxy = (720, 883)  # Coordenadas do botão do navegador
 foralayout = (1403, 187)  # Coordenadas fora do layout
