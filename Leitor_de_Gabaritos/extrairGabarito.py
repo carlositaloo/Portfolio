@@ -21,7 +21,7 @@ def extrairMaiorCtn(frame):
         x, y, w, h = max(x, 0), max(y, 0), max(w, 0), max(h, 0)
         bbox = [x, y, w, h]
         recorte = frame[y:y+h, x:x+w]
-        # recorte = cv2.resize(recorte, (300, 550))
+        recorte = cv2.resize(recorte, (300, 550))
         return recorte, bbox
     else:
         return None, None  # Retorna valores nulos quando não há contornos
