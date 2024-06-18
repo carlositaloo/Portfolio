@@ -3,42 +3,64 @@ import cv2
 import numpy as np
 import imutils
 from imutils.perspective import four_point_transform
+from imutils.contours import sort_contours
 
-imagem_caminho = 'image/gabarito4.png'
+# Configurações e constantes
+IMAGEM_CAMINHO = 'image/gabarito4.png'
+MIN_PIXELS_RATIO = 0.9  # Proporção mínima de pixels para considerar uma bolha preenchida
+USAR_WEBCAM = False
+
+# Gabarito
+GABARITO = {
+    1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'A', 6: 'B', 7: 'C', 8: 'D', 9: 'A', 10: 'B', 11: 'C', 12: 'D',
+    13: 'A', 14: 'B', 15: 'C', 16: 'D', 17: 'A', 18: 'B', 19: 'C', 20: 'D', 21: 'A', 22: 'B', 23: 'C', 24: 'D',
+    25: 'A', 26: 'B', 27: 'C', 28: 'D', 29: 'A', 30: 'B', 31: 'C', 32: 'D', 33: 'A', 34: 'B', 35: 'C', 36: 'D',
+    37: 'A', 38: 'B', 39: 'C', 40: 'D', 41: 'A', 43: 'B', 44: 'C', 45: 'D', 46: 'A', 47: 'B', 48: 'C', 49: 'D',
+    50: 'A', 51: 'B', 52: 'B'
+}
 
 
-def extrairMaiorCtn(frame):
-    imgCinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    imgTh = cv2.adaptiveThreshold(
-        imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 12)
+def reordenar_gabarito(gabarito):
+    valores_impares = [gabarito[k] for k in sorted(gabarito) if k % 2 != 0]
+    valores_pares = [gabarito[k] for k in sorted(gabarito) if k % 2 == 0]
+    novo_gabarito = {k: valores_impares.pop(
+        0) if k % 2 != 0 else valores_pares.pop(0) for k in sorted(gabarito)}
+    return novo_gabarito
+
+
+def converter_gabarito(gabarito):
+    mapeamento = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    return {k: mapeamento[v] for k, v in gabarito.items()}
+
+
+def extrair_maior_contorno(frame):
+    img_cinza = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    img_th = cv2.adaptiveThreshold(
+        img_cinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 12)
     kernel = np.ones((2, 2), np.uint8)
-    imgDil = cv2.dilate(imgTh, kernel)
+    img_dil = cv2.dilate(img_th, kernel)
     contours, _ = cv2.findContours(
-        imgDil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
+        img_dil, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     if contours:
-        maiorCtn = max(contours, key=cv2.contourArea)
-        x, y, w, h = cv2.boundingRect(maiorCtn)
+        maior_contorno = max(contours, key=cv2.contourArea)
+        x, y, w, h = cv2.boundingRect(maior_contorno)
         margin = 10
         x, y, w, h = x - margin, y - margin, w + 2 * margin, h + 2 * margin
         x, y, w, h = max(x, 0), max(y, 0), max(w, 0), max(h, 0)
         bbox = [x, y, w, h]
         recorte = frame[y:y+h, x:x+w]
         return recorte, bbox
-    else:
-        return None, None
+    return None, None
 
 
-def perspectivaCB(img):
+def perspectiva_cb(img):
     cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(cinza, (5, 5), 0)
     edged = cv2.Canny(blurred, 75, 200)
-
     cnts = cv2.findContours(
         edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-
-    if len(cnts) > 0:
+    if cnts:
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
         for c in cnts:
             peri = cv2.arcLength(c, True)
@@ -51,80 +73,115 @@ def perspectivaCB(img):
     return None, None
 
 
-def questoes(gabTh):
-    cnts = cv2.findContours(gabTh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+def encontrar_questoes(gab_th):
+    cnts = cv2.findContours(gab_th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
-    questaoCnts = []
-    for c in cnts:
-        x, y, w, h = cv2.boundingRect(c)
-        ar = w / float(h)
-        if w >= 13 and h >= 13 and 0.1 <= ar <= 3.3:
-            questaoCnts.append(c)
-    return questaoCnts
+    questao_cnts = [c for c in cnts if validar_questao(c)]
+    return questao_cnts
+
+
+def validar_questao(c):
+    x, y, w, h = cv2.boundingRect(c)
+    ar = w / float(h)
+    return w >= 13 and h >= 13 and 0.1 <= ar <= 3.3
 
 
 def processar_frame(frame):
-    zoomGabarito, bbox = extrairMaiorCtn(frame)
-    if zoomGabarito is not None:
-        contorno, bbox2 = perspectivaCB(zoomGabarito)
+    zoom_gabarito, bbox = extrair_maior_contorno(frame)
+    if zoom_gabarito is not None:
+        contorno, bbox2 = perspectiva_cb(zoom_gabarito)
         if contorno is not None:
-            frame_copy = frame.copy()
-            contorno_copy = contorno.copy()
-            cv2.drawContours(frame_copy, [bbox2], -1, (255, 0, 0), 2)
+            return analisar_contorno(frame, contorno, bbox, bbox2)
+    return frame, None, None, None
 
-            imgCinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
-            imgTh = cv2.adaptiveThreshold(
-                imgCinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
-            imgTh_copy = imgTh.copy()
 
-            questaoCnts = questoes(imgTh)
-            for c in questaoCnts:
-                cv2.drawContours(contorno_copy, [c], -1, (0, 255, 0), 2)
+def analisar_contorno(frame, contorno, bbox, bbox2):
+    frame_copy = frame.copy()
+    contorno_copy = contorno.copy()
+    respostas_copy = contorno.copy()
 
-            return frame_copy, contorno_copy, imgTh_copy
-    return frame, None, None
+    # Ajustar bbox2 com a posição do maior contorno (bbox)
+    bbox2 += bbox[:2]
+    cv2.drawContours(frame_copy, [bbox2], -1, (255, 0, 0), 10)
+
+    img_cinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
+    img_th = cv2.adaptiveThreshold(
+        img_cinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
+    questao_cnts = encontrar_questoes(img_th)
+    questao_cnts = sort_contours(questao_cnts, method="top-to-bottom")[0]
+    blocos = [questao_cnts[i*4:(i+1)*4] for i in range(len(questao_cnts) // 4)]
+    cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
+             (255, 255, 0), (255, 0, 255)]
+    cor_index = 0
+    for bloco in blocos:
+        cnts = sort_contours(bloco, method="left-to-right")[0]
+        bubbled = []
+        for j, c in enumerate(cnts):
+            if is_bubbled(c, img_th):
+                bubbled.append((cv2.countNonZero(cv2.bitwise_and(img_th, img_th, mask=cv2.drawContours(
+                    np.zeros(img_th.shape, dtype="uint8"), [c], -1, 255, -1))), j))
+            cv2.drawContours(
+                contorno_copy, [c], -1, cores[cor_index % len(cores)], 2)
+        if bubbled:
+            for b in bubbled:
+                cv2.drawContours(respostas_copy, [
+                                 cnts[b[1]]], -1, (0, 255, 255), 2)
+        cor_index += 1
+    return frame_copy, contorno_copy, respostas_copy, img_th
+
+
+def is_bubbled(c, img_th):
+    mask = np.zeros(img_th.shape, dtype="uint8")
+    cv2.drawContours(mask, [c], -1, 255, -1)
+    mask = cv2.bitwise_and(img_th, img_th, mask=mask)
+    total = cv2.countNonZero(mask)
+    area = cv2.contourArea(c)
+    fill_ratio = total / area
+    return fill_ratio > MIN_PIXELS_RATIO
 
 
 def main():
     os.system("cls")
-    usar_webcam = False
-
-    if usar_webcam:
+    gabarito_reordenado = reordenar_gabarito(GABARITO)
+    gabarito_numerico = converter_gabarito(gabarito_reordenado)
+    if USAR_WEBCAM:
         captura = cv2.VideoCapture(1)
     else:
-        img = cv2.imread(imagem_caminho)
-
-    if (usar_webcam and captura.isOpened()) or (not usar_webcam and img is not None):
+        img = cv2.imread(IMAGEM_CAMINHO)
+    if (USAR_WEBCAM and captura.isOpened()) or (not USAR_WEBCAM and img is not None):
         while True:
             tecla = cv2.waitKey(1)
-            if usar_webcam:
+            if USAR_WEBCAM:
                 _, frame = captura.read()
                 frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
             else:
                 frame = img
-
-            frame_copy, contorno_copy, imgTh_copy = processar_frame(frame)
-
-            # Redimensionar as imagens antes de exibir
-            frame_copy = cv2.resize(frame_copy, (300, 400))
-            cv2.imshow("Video da Webcam", frame_copy)
-            cv2.moveWindow("Video da Webcam", 0, 0)
-
-            if contorno_copy is not None:
-                contorno_copy = cv2.resize(contorno_copy, (300, 400))
-                imgTh_copy = cv2.resize(imgTh_copy, (300, 400))
-                cv2.imshow("Video da Webcam Gabarito", contorno_copy)
-                cv2.imshow("Video da Webcam Cinza", imgTh_copy)
-
+            frame_copy, contorno_copy, respostas_copy, img_th_copy = processar_frame(
+                frame)
+            exibir_frames(frame_copy, contorno_copy,
+                          respostas_copy, img_th_copy)
             if tecla == 27:
+                print(gabarito_reordenado)
                 print('Saindo...')
                 break
-
-        if usar_webcam:
+        if USAR_WEBCAM:
             captura.release()
         cv2.destroyAllWindows()
     else:
         print('Não foi possível carregar a imagem.')
+
+
+def exibir_frames(frame_copy, contorno_copy, respostas_copy, img_th_copy):
+    frame_copy = cv2.resize(frame_copy, (250, 466))
+    cv2.imshow("Video da Webcam", frame_copy)
+    cv2.moveWindow("Video da Webcam", 0, 0)
+    if contorno_copy is not None:
+        contorno_copy = cv2.resize(contorno_copy, (250, 466))
+        respostas_copy = cv2.resize(respostas_copy, (250, 466))
+        img_th_copy = cv2.resize(img_th_copy, (250, 466))
+        cv2.imshow("Video da Webcam Gabarito", contorno_copy)
+        cv2.imshow("Video da Webcam Respostas", respostas_copy)
+        cv2.imshow("Video da Webcam Cinza", img_th_copy)
 
 
 if __name__ == "__main__":
