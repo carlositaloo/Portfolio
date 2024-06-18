@@ -29,7 +29,7 @@ def reordenar_gabarito(gabarito):
 
 
 def converter_gabarito(gabarito):
-    mapeamento = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    mapeamento = {'A': 3, 'B': 2, 'C': 1, 'D': 0}
     return {k: mapeamento[v] for k, v in gabarito.items()}
 
 
@@ -102,14 +102,21 @@ def analisar_contorno(frame, contorno, bbox, bbox2):
 
     # Ajustar bbox2 com a posição do maior contorno (bbox)
     bbox2 += bbox[:2]
-    cv2.drawContours(frame_copy, [bbox2], -1, (255, 0, 0), 10)
+    cv2.drawContours(frame_copy, [bbox2], -1, (255, 50, 255), 2)
 
     img_cinza = cv2.cvtColor(contorno, cv2.COLOR_BGR2GRAY)
     img_th = cv2.adaptiveThreshold(
         img_cinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
     questao_cnts = encontrar_questoes(img_th)
     questao_cnts = sort_contours(questao_cnts, method="top-to-bottom")[0]
-    blocos = [questao_cnts[i*4:(i+1)*4] for i in range(len(questao_cnts) // 4)]
+
+    # Identificar blocos considerando a ordem correta (duas colunas)
+    num_blocos = len(questao_cnts) // 4
+    blocos = []
+    for i in range(num_blocos):  ###############################################################################################
+        blocos.extend(questao_cnts[i*4:(i+1)*4][::-1])
+
+    blocos = [blocos[i*4:(i+1)*4] for i in range(len(blocos) // 4)]
     cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
              (255, 255, 0), (255, 0, 255)]
     cor_index = 0
@@ -125,8 +132,15 @@ def analisar_contorno(frame, contorno, bbox, bbox2):
         if bubbled:
             for b in bubbled:
                 cv2.drawContours(respostas_copy, [
-                                 cnts[b[1]]], -1, (0, 255, 255), 2)
+                                 cnts[b[1]]], -1, (0, 255, 255), 2)  # Amarelo
         cor_index += 1
+
+    # Exemplo de como pintar a primeira bolha do terceiro bloco de vermelho
+    if len(blocos) > 2 and len(blocos[2]) > 0:
+        pintar_bolha = blocos[1][0]
+        cv2.drawContours(respostas_copy, [
+                         pintar_bolha], -1, (0, 0, 255), 2)
+
     return frame_copy, contorno_copy, respostas_copy, img_th
 
 
@@ -161,7 +175,8 @@ def main():
             exibir_frames(frame_copy, contorno_copy,
                           respostas_copy, img_th_copy)
             if tecla == 27:
-                print(gabarito_reordenado)
+                # print(gabarito_reordenado)
+                print(gabarito_numerico)
                 print('Saindo...')
                 break
         if USAR_WEBCAM:
