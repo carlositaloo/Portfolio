@@ -12,7 +12,7 @@ USAR_WEBCAM = False
 
 # Gabarito
 GABARITO = {
-    1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'A', 6: 'B', 7: 'C', 8: 'D', 9: 'A', 10: 'B', 11: 'C', 12: 'D',
+    1: 'C', 2: 'D', 3: 'A', 4: 'D', 5: 'A', 6: 'B', 7: 'C', 8: 'D', 9: 'A', 10: 'B', 11: 'C', 12: 'D',
     13: 'A', 14: 'B', 15: 'C', 16: 'D', 17: 'A', 18: 'B', 19: 'C', 20: 'D', 21: 'A', 22: 'B', 23: 'C', 24: 'D',
     25: 'A', 26: 'B', 27: 'C', 28: 'D', 29: 'A', 30: 'B', 31: 'C', 32: 'D', 33: 'A', 34: 'B', 35: 'C', 36: 'D',
     37: 'A', 38: 'B', 39: 'C', 40: 'D', 41: 'A', 42: 'B', 43: 'C', 44: 'D', 45: 'A', 46: 'B', 47: 'C', 48: 'D',
@@ -20,7 +20,7 @@ GABARITO = {
 }
 
 
-def reordenar_gabarito(gabarito):
+def reordenar_gabarito(gabarito, inverter=False):
     # Ordenar as chaves do gabarito
     chaves_ordenadas = sorted(gabarito.keys())
 
@@ -28,18 +28,25 @@ def reordenar_gabarito(gabarito):
     meio = (len(chaves_ordenadas) + 1) // 2
     primeira_metade = chaves_ordenadas[:meio]
     segunda_metade = chaves_ordenadas[meio:]
-    print(primeira_metade)
-    print(segunda_metade)
 
     # Intercalar as duas metades
     novo_gabarito = {}
     for i in range(len(segunda_metade)):
-        novo_gabarito[2*i + 1] = gabarito[primeira_metade[i]]
-        novo_gabarito[2*i + 2] = gabarito[segunda_metade[i]]
+        if inverter:
+            novo_gabarito[primeira_metade[i]] = gabarito[2*i + 1]
+            novo_gabarito[segunda_metade[i]] = gabarito[2*i + 2]
+        else:
+            novo_gabarito[2*i + 1] = gabarito[primeira_metade[i]]
+            novo_gabarito[2*i + 2] = gabarito[segunda_metade[i]]
 
     # Adicionar a última questão se a quantidade total de questões for ímpar
     if len(primeira_metade) > len(segunda_metade):
-        novo_gabarito[len(novo_gabarito) + 1] = gabarito[primeira_metade[-1]]
+        if inverter:
+            novo_gabarito[primeira_metade[-1]
+                          ] = gabarito[len(novo_gabarito) + 1]
+        else:
+            novo_gabarito[len(novo_gabarito) +
+                          1] = gabarito[primeira_metade[-1]]
 
     return novo_gabarito
 
@@ -137,6 +144,7 @@ def analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico):
     cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
              (255, 255, 0), (255, 0, 255)]
     cor_index = 0
+    respostas_aluno = {}
     for bloco in blocos:
         cnts = sort_contours(bloco, method="left-to-right")[0]
         bubbled = []
@@ -147,20 +155,40 @@ def analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico):
             cv2.drawContours(
                 contorno_copy, [c], -1, cores[cor_index % len(cores)], 2)
         if bubbled:
+            bubbled.sort(reverse=True)
+            if len(bubbled) == 1:
+                respostas_aluno[len(respostas_aluno) + 1] = chr(
+                    bubbled[0][1] + 65)  # Converter índice para letra
+            else:
+                respostas_aluno[len(respostas_aluno) + 1] = '-'
             for b in bubbled:
                 cv2.drawContours(respostas_copy, [
                                  cnts[b[1]]], -1, (0, 255, 255), 2)  # Amarelo
+        else:
+            respostas_aluno[len(respostas_aluno) + 1] = '-'
         cor_index += 1
 
-    # Exemplo de como pintar a primeira bolha do terceiro bloco de vermelho
-    if len(blocos) > 2 and len(blocos[2]) > 0:
-        for numero, resposta in gabarito_numerico.items():
-            # print(f"Questão {numero}: Resposta {resposta}")
-            pintar_bolha = blocos[numero][resposta]
+    # Verificar respostas do aluno em comparação com o gabarito
+    for num_questao, resposta_aluno in respostas_aluno.items():
+        resposta_certa = chr(gabarito_numerico[num_questao - 1] + 65)
+        if resposta_aluno == '-':
+            # Vermelho para questões não respondidas
             cv2.drawContours(respostas_copy, [
-                             pintar_bolha], -1, (0, 0, 255), 2)
+                             blocos[num_questao-1][gabarito_numerico[num_questao-1]]], -1, (0, 0, 255), 2)
+        elif resposta_aluno == resposta_certa:
+            # Verde para respostas corretas
+            cv2.drawContours(respostas_copy, [
+                             blocos[num_questao-1][gabarito_numerico[num_questao-1]]], -1, (0, 255, 0), 2)
+        else:
+            # Vermelho para respostas incorretas
+            cv2.drawContours(respostas_copy, [
+                             blocos[num_questao-1][gabarito_numerico[num_questao-1]]], -1, (0, 0, 255), 2)
 
-    return frame_copy, contorno_copy, respostas_copy, img_th
+    # Reordenar as respostas do aluno de volta à ordem original
+    respostas_aluno_reordenadas = reordenar_gabarito(
+        respostas_aluno, inverter=True)
+
+    return frame_copy, contorno_copy, respostas_copy, img_th, respostas_aluno_reordenadas
 
 
 def is_bubbled(c, img_th):
@@ -189,14 +217,17 @@ def main():
                 frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
             else:
                 frame = img
-            frame_copy, contorno_copy, respostas_copy, img_th_copy = processar_frame(
+            frame_copy, contorno_copy, respostas_copy, img_th_copy, respostas_aluno = processar_frame(
                 frame, gabarito_numerico)
             exibir_frames(frame_copy, contorno_copy,
                           respostas_copy, img_th_copy)
             if tecla == 27:
-                print('\n', gabarito_reordenado)
-                print('\n', gabarito_numerico)
-                print('Saindo...')
+                respostas_aluno = dict(sorted(respostas_aluno.items()))
+                print('\nRespostas do aluno:\n')
+                # for k, v in respostas_aluno.items():
+                #     print(f'{k}: {v}')
+                print(respostas_aluno)
+                print('\nSaindo...')
                 break
         if USAR_WEBCAM:
             captura.release()
