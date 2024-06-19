@@ -15,22 +15,39 @@ GABARITO = {
     1: 'A', 2: 'B', 3: 'C', 4: 'D', 5: 'A', 6: 'B', 7: 'C', 8: 'D', 9: 'A', 10: 'B', 11: 'C', 12: 'D',
     13: 'A', 14: 'B', 15: 'C', 16: 'D', 17: 'A', 18: 'B', 19: 'C', 20: 'D', 21: 'A', 22: 'B', 23: 'C', 24: 'D',
     25: 'A', 26: 'B', 27: 'C', 28: 'D', 29: 'A', 30: 'B', 31: 'C', 32: 'D', 33: 'A', 34: 'B', 35: 'C', 36: 'D',
-    37: 'A', 38: 'B', 39: 'C', 40: 'D', 41: 'A', 43: 'B', 44: 'C', 45: 'D', 46: 'A', 47: 'B', 48: 'C', 49: 'D',
-    50: 'A', 51: 'B', 52: 'B'
+    37: 'A', 38: 'B', 39: 'C', 40: 'D', 41: 'A', 42: 'B', 43: 'C', 44: 'D', 45: 'A', 46: 'B', 47: 'C', 48: 'D',
+    49: 'A', 50: 'B', 51: 'C', 52: 'D'
 }
 
 
 def reordenar_gabarito(gabarito):
-    valores_impares = [gabarito[k] for k in sorted(gabarito) if k % 2 != 0]
-    valores_pares = [gabarito[k] for k in sorted(gabarito) if k % 2 == 0]
-    novo_gabarito = {k: valores_impares.pop(
-        0) if k % 2 != 0 else valores_pares.pop(0) for k in sorted(gabarito)}
+    # Ordenar as chaves do gabarito
+    chaves_ordenadas = sorted(gabarito.keys())
+
+    # Dividir o gabarito em duas metades, garantindo que a primeira metade inclua a questão central quando o número total é par
+    meio = (len(chaves_ordenadas) + 1) // 2
+    primeira_metade = chaves_ordenadas[:meio]
+    segunda_metade = chaves_ordenadas[meio:]
+    print(primeira_metade)
+    print(segunda_metade)
+
+    # Intercalar as duas metades
+    novo_gabarito = {}
+    for i in range(len(segunda_metade)):
+        novo_gabarito[2*i + 1] = gabarito[primeira_metade[i]]
+        novo_gabarito[2*i + 2] = gabarito[segunda_metade[i]]
+
+    # Adicionar a última questão se a quantidade total de questões for ímpar
+    if len(primeira_metade) > len(segunda_metade):
+        novo_gabarito[len(novo_gabarito) + 1] = gabarito[primeira_metade[-1]]
+
     return novo_gabarito
 
 
 def converter_gabarito(gabarito):
-    mapeamento = {'A': 3, 'B': 2, 'C': 1, 'D': 0}
-    return {k: mapeamento[v] for k, v in gabarito.items()}
+    mapeamento = {'A': 0, 'B': 1, 'C': 2, 'D': 3}
+    novo_gabarito = {k-1: mapeamento[v] for k, v in gabarito.items()}
+    return novo_gabarito
 
 
 def extrair_maior_contorno(frame):
@@ -86,16 +103,16 @@ def validar_questao(c):
     return w >= 13 and h >= 13 and 0.1 <= ar <= 3.3
 
 
-def processar_frame(frame):
+def processar_frame(frame, gabarito_numerico):
     zoom_gabarito, bbox = extrair_maior_contorno(frame)
     if zoom_gabarito is not None:
         contorno, bbox2 = perspectiva_cb(zoom_gabarito)
         if contorno is not None:
-            return analisar_contorno(frame, contorno, bbox, bbox2)
+            return analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico)
     return frame, None, None, None
 
 
-def analisar_contorno(frame, contorno, bbox, bbox2):
+def analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico):
     frame_copy = frame.copy()
     contorno_copy = contorno.copy()
     respostas_copy = contorno.copy()
@@ -111,10 +128,10 @@ def analisar_contorno(frame, contorno, bbox, bbox2):
     questao_cnts = sort_contours(questao_cnts, method="top-to-bottom")[0]
 
     # Identificar blocos considerando a ordem correta (duas colunas)
-    num_blocos = len(questao_cnts) // 4
+    num_blocos = len(questao_cnts) // 8
     blocos = []
-    for i in range(num_blocos):  ###############################################################################################
-        blocos.extend(questao_cnts[i*4:(i+1)*4][::-1])
+    for i in range(num_blocos):
+        blocos.extend(questao_cnts[i*8:(i+1)*8][::-1])
 
     blocos = [blocos[i*4:(i+1)*4] for i in range(len(blocos) // 4)]
     cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
@@ -137,9 +154,11 @@ def analisar_contorno(frame, contorno, bbox, bbox2):
 
     # Exemplo de como pintar a primeira bolha do terceiro bloco de vermelho
     if len(blocos) > 2 and len(blocos[2]) > 0:
-        pintar_bolha = blocos[1][0]
-        cv2.drawContours(respostas_copy, [
-                         pintar_bolha], -1, (0, 0, 255), 2)
+        for numero, resposta in gabarito_numerico.items():
+            # print(f"Questão {numero}: Resposta {resposta}")
+            pintar_bolha = blocos[numero][resposta]
+            cv2.drawContours(respostas_copy, [
+                             pintar_bolha], -1, (0, 0, 255), 2)
 
     return frame_copy, contorno_copy, respostas_copy, img_th
 
@@ -171,12 +190,12 @@ def main():
             else:
                 frame = img
             frame_copy, contorno_copy, respostas_copy, img_th_copy = processar_frame(
-                frame)
+                frame, gabarito_numerico)
             exibir_frames(frame_copy, contorno_copy,
                           respostas_copy, img_th_copy)
             if tecla == 27:
-                # print(gabarito_reordenado)
-                print(gabarito_numerico)
+                print('\n', gabarito_reordenado)
+                print('\n', gabarito_numerico)
                 print('Saindo...')
                 break
         if USAR_WEBCAM:
