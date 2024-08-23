@@ -42,11 +42,9 @@ def reordenar_gabarito(gabarito, inverter=False):
 
     if len(primeira_metade) > len(segunda_metade):
         if inverter:
-            novo_gabarito[primeira_metade[-1]
-                          ] = gabarito[len(novo_gabarito) + 1]
+            novo_gabarito[primeira_metade[-1]] = gabarito[len(novo_gabarito) + 1]
         else:
-            novo_gabarito[len(novo_gabarito) +
-                          1] = gabarito[primeira_metade[-1]]
+            novo_gabarito[len(novo_gabarito) + 1] = gabarito[primeira_metade[-1]]
 
     return novo_gabarito
 
@@ -110,6 +108,22 @@ def validar_questao(c):
     return w >= 13 and h >= 13 and 0.1 <= ar <= 3.3
 
 
+def agrupar_por_proximidade(questao_cnts):
+    grupos = []
+    while questao_cnts:
+        grupo = []
+        q = questao_cnts.pop(0)
+        grupo.append(q)
+        x, y, w, h = cv2.boundingRect(q)
+        for i, c in enumerate(questao_cnts[:]):
+            cx, cy, cw, ch = cv2.boundingRect(c)
+            if abs(cx - x) < 50 and abs(cy - y) < 50:  # Ajuste a proximidade conforme necessário
+                grupo.append(c)
+                questao_cnts.remove(c)
+        grupos.append(grupo)
+    return grupos
+
+
 def processar_frame(frame, gabarito_numerico):
     zoom_gabarito, bbox = extrair_maior_contorno(frame)
     if zoom_gabarito is not None:
@@ -132,46 +146,22 @@ def analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico):
     img_th = cv2.adaptiveThreshold(
         img_cinza, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 25, 16)
     questao_cnts = encontrar_questoes(img_th)
-    questao_cnts = sort_contours(questao_cnts, method="top-to-bottom")[0]
 
-    # Dividir as questões em duas colunas
-    colunas = [[], []]
-    for (i, c) in enumerate(questao_cnts):
-        colunas[i % num_colunas].append(c)
+    # Agrupar questões por proximidade
+    grupos = agrupar_por_proximidade(questao_cnts)
 
-    # Ordenar cada coluna de cima para baixo
-    for coluna in colunas:
-        coluna.sort(key=lambda x: cv2.boundingRect(x)[1])
-
-    # Misturar as colunas para obter a ordem correta
-    questao_cnts = [c for col in colunas for c in col]
-
-    blocos = [questao_cnts[i:i + 4] for i in range(0, len(questao_cnts), 4)]
-    cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255),
-             (255, 255, 0), (255, 0, 255)]
+    # Ordenar e processar cada grupo
+    cores = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
     cor_index = 0
     respostas_aluno = {}
-    for bloco in blocos:
-        bubbled = []
-        for j, c in enumerate(bloco):
+    for grupo in grupos:
+        grupo.sort(key=lambda x: cv2.boundingRect(x)[1])  # Ordenar de cima para baixo dentro do grupo
+        for i, c in enumerate(grupo):
             if is_bubbled(c, img_th):
-                bubbled.append((cv2.countNonZero(cv2.bitwise_and(img_th, img_th, mask=cv2.drawContours(
-                    np.zeros(img_th.shape, dtype="uint8"), [c], -1, 255, -1))), j))
-            cv2.drawContours(
-                contorno_copy, [c], -1, cores[cor_index % len(cores)], 2)
-        if bubbled:
-            bubbled.sort(reverse=True)
-            if len(bubbled) == 1:
-                # Converter índice para letra
-                respostas_aluno[len(respostas_aluno) +
-                                1] = chr(bubbled[0][1] + 65)
+                respostas_aluno[len(respostas_aluno) + 1] = chr(i + 65)
             else:
                 respostas_aluno[len(respostas_aluno) + 1] = '-'
-            for b in bubbled:
-                cv2.drawContours(respostas_copy, [
-                                 bloco[b[1]]], -1, (0, 255, 255), 2)  # Amarelo
-        else:
-            respostas_aluno[len(respostas_aluno) + 1] = '-'
+            cv2.drawContours(contorno_copy, [c], -1, cores[cor_index % len(cores)], 2)
         cor_index += 1
 
     # Verificar respostas do aluno em comparação com o gabarito
@@ -179,20 +169,16 @@ def analisar_contorno(frame, contorno, bbox, bbox2, gabarito_numerico):
         resposta_certa = chr(gabarito_numerico[num_questao - 1] + 65)
         if resposta_aluno == '-':
             # Vermelho para questões não respondidas
-            cv2.drawContours(respostas_copy, [
-                             questao_cnts[num_questao - 1]], -1, (0, 0, 255), 2)
+            cv2.drawContours(respostas_copy, [questao_cnts[num_questao - 1]], -1, (0, 0, 255), 2)
         elif resposta_aluno == resposta_certa:
             # Verde para respostas corretas
-            cv2.drawContours(respostas_copy, [
-                             questao_cnts[num_questao - 1]], -1, (0, 255, 0), 2)
+            cv2.drawContours(respostas_copy, [questao_cnts[num_questao - 1]], -1, (0, 255, 0), 2)
         else:
             # Vermelho para respostas incorretas
-            cv2.drawContours(respostas_copy, [
-                             questao_cnts[num_questao - 1]], -1, (0, 0, 255), 2)
+            cv2.drawContours(respostas_copy, [questao_cnts[num_questao - 1]], -1, (0, 0, 255), 2)
 
     # Reordenar as respostas do aluno de volta à ordem original
-    respostas_aluno_reordenadas = reordenar_gabarito(
-        respostas_aluno, inverter=True)
+    respostas_aluno_reordenadas = reordenar_gabarito(respostas_aluno, inverter=True)
 
     return frame_copy, contorno_copy, respostas_copy, img_th, respostas_aluno_reordenadas
 
