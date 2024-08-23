@@ -8,7 +8,7 @@ Cada projeto neste repositório demonstra minha habilidade em usar Python para c
 
 ## Tecnologia Usada
 
-Todos os projetos são desenvolvidos em Python, uma linguagem de programação poderosa e versátil. Utilizo diversas bibliotecas e frameworks Python para maximizar a funcionalidade e eficiência dos meus projetos.
+Todos os projetos são desenvolvidos em Python, com exceção de um que é em powershell.
 
 ## Contribuições e Feedback
 
