@@ -10,10 +10,11 @@ import keyboard
 
 os.system('cls')
 
-PLANILHA = openpyxl.load_workbook('NOTAS.xlsx')
+# PLANILHA = openpyxl.load_workbook('NOTAS.xlsx')
+PLANILHA = openpyxl.load_workbook('Exemplo.xlsx')
 PAGINA = PLANILHA['NOTAS']
 
-pyautogui.click(689, 884, duration=0.25) #Navegador
+pyautogui.click(82,877, duration=0.25) #Navegador
 pyautogui.doubleClick(16, 109, duration=0.25)
 pyautogui.press('tab')
 
@@ -22,6 +23,7 @@ projetocamin = True # Coloque True para 8º e 9º anos
 adicionarcoluna = 0 # Use 2 para adicionar a quantidade de cada key da lista.
 # Lista das colunas a serem preenchidas
 # Lista = {10: 'Art.', 28: 'Ciên.', 16: 'E.F.', 34: 'Relig.', 58: 'É.C.', 46: 'Geo.', 40: 'His.', 52: 'Ing.', 4: 'Port.', 22: 'Mat.', 67: 'P.I.', 70: 'Proj.C.'}
+
 # EJAAAA:
 Lista = {10: 'Art.', 28: 'Ciên.', 16: 'E.F.', 34: 'Relig.', 46: 'Geo.', 40: 'His.', 52: 'Ing.', 4: 'Port.', 22: 'Mat.'}
 
