@@ -8,9 +8,9 @@ import os
 # Configurações iniciais
 timeset = 0.1
 # idatendimento = pyperclip.paste()
-idatendimento = "1384884"
-ticket = "101010"
-etapa = "Analise da Coordena"
+idatendimento = "722969"
+ticket = ""
+etapa = "Conluido(Indeferido)"
 
 # Correção do caminho - adicione apenas estas 2 linhas
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -107,7 +107,8 @@ pyautogui.hotkey('ctrl', 'v')
 pyautogui.press('tab')
 pyautogui.press('tab')
 pyautogui.press('tab')
-pyautogui.write(f'Solicitação via ticket: {ticket}', interval=0.05)
+# pyautogui.write(f'Solicitação via ticket: {ticket}', interval=0.05)
+pyautogui.write('Atendimento encerrado por falta de solução.')
 pyautogui.press('tab')
 pyautogui.press('tab')
 pyperclip.copy(etapa)
