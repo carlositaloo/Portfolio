@@ -8,9 +8,9 @@ import os
 # Configurações iniciais
 timeset = 0.1
 # idatendimento = pyperclip.paste()
-idatendimento = "722969"
-ticket = ""
-etapa = "Conluido(Indeferido)"
+idatendimento = "1392216"
+ticket = "883103"
+etapa = ""
 
 # Correção do caminho - adicione apenas estas 2 linhas
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,7 +63,6 @@ def aguardar_imagem(imagem_path, numero=1, timeout=30, intervalo=0.1, confidence
 
 
 aguardar_imagem('img\\img0.png')
-aguardar_imagem('img\\img1.png')
 img1 = aguardar_imagem('img\\img1.png')
 
 verificar_cancelamento()
@@ -107,8 +106,10 @@ pyautogui.hotkey('ctrl', 'v')
 pyautogui.press('tab')
 pyautogui.press('tab')
 pyautogui.press('tab')
-# pyautogui.write(f'Solicitação via ticket: {ticket}', interval=0.05)
-pyautogui.write('Atendimento encerrado por falta de solução.')
+
+pyautogui.write(f'Solicitação via ticket: {ticket}', interval=0.05)
+# pyautogui.write('Correcao de atendimento')
+
 pyautogui.press('tab')
 pyautogui.press('tab')
 pyperclip.copy(etapa)

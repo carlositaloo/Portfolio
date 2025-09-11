@@ -33,33 +33,35 @@ def sleep_cancelamento(duration):
         elapsed += sleep_time
 
 
-def aguardar_imagem(imagem_path, timeout=30, intervalo=0.1, confidence=0.8):
-    """Aguarda uma imagem aparecer na tela"""
-    # Correção: construir caminho absoluto
+def aguardar_imagem(imagem_path, numero=1, timeout=30, intervalo=0.1, confidence=0.8):
+    """
+    Aguarda uma imagem aparecer na tela.
+    numero: qual ocorrência da imagem retornar (1 = primeira, 2 = segunda, etc.)
+    """
     caminho_completo = os.path.join(script_dir, imagem_path)
-    
     tempo_inicial = time.time()
+
     while time.time() - tempo_inicial < timeout:
         verificar_cancelamento()
         try:
-            posicao = pyautogui.locateOnScreen(caminho_completo, confidence=confidence)
-            if posicao:
-                return posicao
-        except pyautogui.ImageNotFoundException:
-            pass
+            todas = list(pyautogui.locateAllOnScreen(
+                caminho_completo, confidence=confidence))
+            if len(todas) >= numero:
+                return todas[numero - 1]  # retorna a n-ésima ocorrência
         except Exception as e:
-            print(f"Erro ao procurar imagem: {e}")
-
-        # Usa sleep com verificação de cancelamento
+            pass
         sleep_cancelamento(intervalo)
-    raise TimeoutError(f"Imagem {imagem_path} não encontrada em {timeout}s")
+
+    raise TimeoutError(
+        f"Imagem {imagem_path} (ocorrência {numero}) não encontrada em {timeout}s")
 
 
 pyautogui.click(17, 43, duration=0.15) # MENU
 aguardar_imagem('img\\menu0.png')
 pyautogui.click(107, 283, duration=0.15) # SERVIÇO GLOBAIS
 sleep_cancelamento(timeset)
-pyautogui.click(1006, 618, duration=0.15) # ERRO
+img = aguardar_imagem('img\\erro.png')
+pyautogui.click(img, duration=0.15)
 sleep_cancelamento(timeset)
 aguardar_imagem('img\\cortina0.png')
 pyautogui.click(179, 44, duration=0.15) # SUB MENU

@@ -109,6 +109,7 @@ pyautogui.hotkey('ctrl', 'v')
 pyautogui.click(967, 517, duration=0.15)
 pyautogui.hotkey('ctrl', 'v')
 pyautogui.click(945, 609, duration=0.15)
+pyautogui.click(643, 655, duration=0.15)
 pyautogui.click(1099, 718, duration=0.15)
 
 pyperclip.copy(f'''
