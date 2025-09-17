@@ -8,9 +8,11 @@ import os
 # Configurações iniciais
 timeset = 0.1
 # idatendimento = pyperclip.paste()
-idatendimento = "1392216"
-ticket = "883103"
-etapa = ""
+idatendimento = "1381951"
+ticket = "379426"
+etapa = "PENDENTE DE VALIDAÇÃO"
+mensagem = f"Solicitação via ticket: {ticket}"
+print(mensagem)
 
 # Correção do caminho - adicione apenas estas 2 linhas
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -107,8 +109,9 @@ pyautogui.press('tab')
 pyautogui.press('tab')
 pyautogui.press('tab')
 
-pyautogui.write(f'Solicitação via ticket: {ticket}', interval=0.05)
-# pyautogui.write('Correcao de atendimento')
+for char in mensagem:
+    keyboard.write(char)
+    time.sleep(0.05)
 
 pyautogui.press('tab')
 pyautogui.press('tab')
