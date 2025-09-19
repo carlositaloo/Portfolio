@@ -5,25 +5,27 @@ import pyperclip
 import sys
 import os
 
+# ------------------------------
 # Configurações iniciais
+# ------------------------------
 timeset = 0.1
-usuario = pyperclip.paste()
-
-# Correção do caminho - adicione apenas estas 2 linhas
+usuario = pyperclip.paste().strip()
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
+# ------------------------------
+# Funções utilitárias
+# ------------------------------
+
 def verificar_cancelamento():
+    """Cancela o script se ESC for pressionado"""
     try:
         if keyboard.is_pressed('esc'):
             print("Script cancelado pelo usuário.")
-            time.sleep(0.1)  # Evita múltiplas detecções
-            # Verifica novamente para confirmar
+            time.sleep(0.1)  # evita múltiplas detecções
             if keyboard.is_pressed('esc'):
                 sys.exit()
     except Exception:
-        # Continua executando se houver erro na detecção
         pass
-
 
 def sleep_cancelamento(duration):
     """Sleep que verifica ESC a cada 0.1s"""
@@ -34,90 +36,113 @@ def sleep_cancelamento(duration):
         time.sleep(sleep_time)
         elapsed += sleep_time
 
-
 def aguardar_imagem(imagem_path, timeout=30, intervalo=0.1, confidence=0.8):
     """Aguarda uma imagem aparecer na tela"""
-    # Correção: construir caminho absoluto
     caminho_completo = os.path.join(script_dir, imagem_path)
+    inicio = time.time()
     
-    tempo_inicial = time.time()
-    while time.time() - tempo_inicial < timeout:
+    while time.time() - inicio < timeout:
         verificar_cancelamento()
         try:
             posicao = pyautogui.locateOnScreen(caminho_completo, confidence=confidence)
             if posicao:
                 return posicao
-        except pyautogui.ImageNotFoundException:
-            pass
         except Exception as e:
-            print(f"Erro ao procurar imagem: {e}")
-
-        # Usa sleep com verificação de cancelamento
+            # Ignora exceções comuns de imagem não encontrada
+            pass
         sleep_cancelamento(intervalo)
+    
     raise TimeoutError(f"Imagem {imagem_path} não encontrada em {timeout}s")
 
+def clicar(posicao, duration=0.15, clicks=1, interval=0.0):
+    """Clique seguro com verificação de cancelamento"""
+    verificar_cancelamento()
+    if clicks == 1:
+        pyautogui.click(posicao, duration=duration)
+    else:
+        pyautogui.click(posicao, clicks=clicks, interval=interval, duration=duration)
+    sleep_cancelamento(0.1)
 
-aguardar_imagem('img\\usuario.png')
-aguardar_imagem('img\\pessoas.png')
+def escrever(texto, intervalo=0.05):
+    """Escreve texto simulando teclado"""
+    verificar_cancelamento()
+    pyautogui.write(texto, interval=intervalo)
+    sleep_cancelamento(0.1)
+
+def copiar_texto():
+    """Copia do clipboard após selecionar"""
+    verificar_cancelamento()
+    pyautogui.hotkey('ctrl', 'c')
+    sleep_cancelamento(0.2)
+    return pyperclip.paste()
+
+def colar_texto():
+    """Cola do clipboard"""
+    verificar_cancelamento()
+    pyautogui.hotkey('ctrl', 'v')
+    sleep_cancelamento(0.1)
+
+# ------------------------------
+# Execução do script
+# ------------------------------
+
+# Localizar imagens principais
 iusuario = aguardar_imagem('img\\usuario.png')
 pessoas = aguardar_imagem('img\\pessoas.png')
 porusuario = aguardar_imagem('img\\porusuario.png')
 
-verificar_cancelamento()
-
-pyautogui.click(iusuario, duration=0.15)
-pyautogui.click(porusuario, duration=0.15)
+# Preencher filtro por usuário
+clicar(porusuario)
 aguardar_imagem('img\\filtro.png')
-pyautogui.write(usuario, interval=0.05)
+escrever(usuario)
 pyautogui.press('enter')
-pyautogui.click(213, 358, duration=0.15)
-time.sleep(0.5)  # Espera a tela carregar
-pyautogui.hotkey('ctrl', 'c')
+aguardar_imagem('img\\select.png')
+clicar((213, 358))
+sleep_cancelamento(0.5)
+copiar_texto()  # Ctrl+C
 
-verificar_cancelamento()
-
-pyautogui.click(pessoas, duration=0.15)
-pyautogui.click(130, 227, duration=0.15)
+# Preencher filtro na aba "pessoas"
+clicar(pessoas)
+sleep_cancelamento(0.1)
+clicar((130, 227))
 aguardar_imagem('img\\filtro.png')
-pyautogui.hotkey('ctrl', 'v')
+colar_texto()
 pyautogui.press('enter')
-time.sleep(0.5)  # Espera a tela carregar
+aguardar_imagem('img\\select.png')
 
-verificar_cancelamento()
-
-pyautogui.doubleClick(673, 337, duration=0.15)
+# Selecionar pessoa e copiar números
+clicar((673, 337), clicks=2)
 aguardar_imagem('img\\pessoa.png')
-pyautogui.click(630, 372, duration=0.15)
-time.sleep(0.5)
-pyautogui.click(859, 319, duration=0.15)
+clicar((630, 372))
+sleep_cancelamento(0.5)
+clicar((859, 319))
 pyautogui.hotkey('ctrl', 'a')
-pyautogui.hotkey('ctrl', 'c')
-time.sleep(0.2)  # espera o SO processar o comando
-conteudo = pyperclip.paste()
-numeros = ''.join(ch for ch in conteudo if ch.isdigit())
+numeros = ''.join(ch for ch in copiar_texto() if ch.isdigit())
 pyperclip.copy(numeros)
 
-verificar_cancelamento()
+# Atualizar dados do usuário
+clicar(iusuario)
+aguardar_imagem('img\\select.png')
+clicar((213, 358), clicks=2)
+aguardar_imagem('img\\usuario_detalhe.png')
+clicar((743, 597))
+aguardar_imagem('img\\alterar_senha.png')
+clicar((964, 479))
+colar_texto()
+clicar((967, 517))
+colar_texto()
+sleep_cancelamento(0.1)
+clicar((945, 609))
+if aguardar_imagem('img\\senha_login.png', timeout=4):
+    clicar((643, 655))
+sleep_cancelamento(0.1)
+clicar((1099, 718))
+sleep_cancelamento(0.1)
 
-pyautogui.click(iusuario, duration=0.15)
-pyautogui.doubleClick(213, 358, duration=0.15)
-time.sleep(0.5)
-pyautogui.click(743, 597, duration=0.15)
-time.sleep(0.5)
-pyautogui.click(964, 479, duration=0.15)
-pyautogui.hotkey('ctrl', 'v')
-pyautogui.click(967, 517, duration=0.15)
-pyautogui.hotkey('ctrl', 'v')
-pyautogui.click(945, 609, duration=0.15)
-
-pyautogui.click(643, 655, duration=0.15)
-pyautogui.click(1099, 718, duration=0.15)
-
-pyperclip.copy(f'''
+# Mensagem final no clipboard
+pyperclip.copy(f"""
 A senha do usuário {usuario} foi redefinida para o CPF do mesmo (somente números). Ao acessar pela primeira vez, será solicitado que altere a senha:
 
 • No primeiro campo, insira a senha atual (CPF do usuário).
 • Nos campos seguintes, digite a nova senha e confirme.
-''')
-
-
+""")

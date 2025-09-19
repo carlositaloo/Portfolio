@@ -13,7 +13,25 @@ import os
 timeset = 0.1
 usuario = pyperclip.paste().strip()
 
-permission = False
+def perguntar_bool(pergunta="Digite True/False ou 1/0: "):
+    while True:
+        resposta = input(pergunta).strip().lower()
+        
+        if resposta in ["true", "1"]:
+            return True
+        elif resposta in ["false", "0"]:
+            return False
+        else:
+            print("Entrada inválida! Digite True, False, 1 ou 0.")
+
+# Exemplo de uso
+permission = perguntar_bool("Você deseja pular a etapa de enviar GED? (True/False ou 1 - Sim / 0 - Não): ")
+
+if not permission:  # equivale a if permission == False:
+    print("Função desativada.")
+else:
+    print("Função ativada.")
+
 
 
 # Correção do caminho - adicione apenas estas 2 linhas
@@ -67,7 +85,6 @@ def aguardar_imagem(imagem_path, numero=1, timeout=30, intervalo=0.1, confidence
 
 
 if permission == False:
-    aguardar_imagem('img\\img0.png')
     img = aguardar_imagem('img\\img1.png')
     verificar_cancelamento()
     pyautogui.click(img, duration=0.15)
@@ -78,6 +95,18 @@ if permission == False:
         pyautogui.write(usuario)
         time.sleep(0.2)  # espera o SO processar o comando
         pyautogui.press('enter')
+
+    try:
+        img = aguardar_imagem('img\\img10.png', timeout=3)
+        if img:
+            while True:
+                resposta = input("Imagem encontrada! Digite 'sim' para continuar: ").strip().lower()
+                if resposta == "sim":
+                    break
+                else:
+                    print("Digite exatamente 'sim' para continuar...")
+    except TimeoutError:
+        img = None  # não achou a imagem, só segue sem o input
 
     img = aguardar_imagem('img\\img3.png')
     pyautogui.click(img, duration=0.15)
