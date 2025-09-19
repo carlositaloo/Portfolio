@@ -1,4 +1,5 @@
 import pyautogui
+import pyperclip
 import time
 import keyboard
 from selenium import webdriver
@@ -10,7 +11,10 @@ import os
 
 # Configurações iniciais
 timeset = 0.1
-usuario = '1980001454'
+usuario = pyperclip.paste().strip()
+
+permission = False
+
 
 # Correção do caminho - adicione apenas estas 2 linhas
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,33 +66,34 @@ def aguardar_imagem(imagem_path, numero=1, timeout=30, intervalo=0.1, confidence
         f"Imagem {imagem_path} (ocorrência {numero}) não encontrada em {timeout}s")
 
 
-aguardar_imagem('img\\img0.png')
-img = aguardar_imagem('img\\img1.png')
-verificar_cancelamento()
-pyautogui.click(img, duration=0.15)
-img = aguardar_imagem('img\\img2.png')
-if img:  # Se achou a imagem
-    x, y = pyautogui.center(img)  # pega o centro
-    pyautogui.click(x, y + 50, duration=0.15)  # clica 100px abaixo
-    pyautogui.write(usuario)
-    time.sleep(0.2)  # espera o SO processar o comando
-    pyautogui.press('enter')
+if permission == False:
+    aguardar_imagem('img\\img0.png')
+    img = aguardar_imagem('img\\img1.png')
+    verificar_cancelamento()
+    pyautogui.click(img, duration=0.15)
+    img = aguardar_imagem('img\\img2.png')
+    if img:  # Se achou a imagem
+        x, y = pyautogui.center(img)  # pega o centro
+        pyautogui.click(x, y + 50, duration=0.15)  # clica 100px abaixo
+        pyautogui.write(usuario)
+        time.sleep(0.2)  # espera o SO processar o comando
+        pyautogui.press('enter')
 
-img = aguardar_imagem('img\\img3.png')
-pyautogui.click(img, duration=0.15)
-pyautogui.hotkey('ctrl', 'p')
-img = aguardar_imagem('img\\img4.png')
-pyautogui.click(img, duration=0.15)
+    img = aguardar_imagem('img\\img3.png')
+    pyautogui.click(img, duration=0.15)
+    pyautogui.hotkey('ctrl', 'p')
+    img = aguardar_imagem('img\\img4.png')
+    pyautogui.click(img, duration=0.15)
 
-aguardar_imagem('img\\img5.png')
-img = aguardar_imagem('img\\img6.png')
-pyautogui.click(img, duration=0.15)
-img = aguardar_imagem('img\\img7.png')
-pyautogui.click(img, duration=0.15)
-img = aguardar_imagem('img\\img8.png')
-pyautogui.click(img, duration=0.15)
-img = aguardar_imagem('img\\img9.png')
-pyautogui.click(img, duration=0.15)
+    aguardar_imagem('img\\img5.png')
+    img = aguardar_imagem('img\\img6.png')
+    pyautogui.click(img, duration=0.15)
+    img = aguardar_imagem('img\\img7.png')
+    pyautogui.click(img, duration=0.15)
+    img = aguardar_imagem('img\\img8.png')
+    pyautogui.click(img, duration=0.15)
+    img = aguardar_imagem('img\\img9.png')
+    pyautogui.click(img, duration=0.15)
 
 options = webdriver.ChromeOptions()
 options.add_argument('--headless=new')
