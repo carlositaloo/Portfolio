@@ -8,9 +8,9 @@ import os
 # Configurações iniciais
 timeset = 0.1
 # idatendimento = pyperclip.paste()
-idatendimento = "1381951"
-ticket = "379426"
-etapa = "PENDENTE DE VALIDAÇÃO"
+idatendimento = "1389218"
+ticket = "600335"
+etapa = "Pendente de validação"
 mensagem = f"Solicitação via ticket: {ticket}"
 print(mensagem)
 
