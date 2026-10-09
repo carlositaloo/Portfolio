@@ -27,7 +27,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo [3/3] Gerando executavel...
-pyinstaller --onefile --noconsole --name "CorretorOrtografico" --hidden-import=pystray._win32 corretor.py
+pyinstaller CorretorOrtografico.spec
 if %ERRORLEVEL% NEQ 0 (
     echo.
     echo ERRO: falha ao gerar o executavel.
