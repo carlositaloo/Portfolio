@@ -113,7 +113,9 @@ def atalho(teclas, duration=0.1):
 
 clicar(aguardar_imagem('img\\menu.png', click='bottomleft'))  # MENU
 clicar(aguardar_imagem('img\\servicosGlobais.png'))  # SERVIÇOS GLOBAIS
-# clicar(aguardar_imagem('img\\avisoGlobais.png', click='bottomright'))  # AVISO SERVIÇOS GLOBAIS
+clicar(aguardar_imagem('img\\avisoGlobais.png', click='bottomright', timeout=5, continuar=True))  # AVISO SERVIÇOS GLOBAIS
+if aguardar_imagem('img\\avisoGlobais2.png', timeout=5, continuar=True):  # AVISO SERVIÇOS GLOBAIS
+    clicar(aguardar_imagem('img\\avisoGlobais2nao.png', timeout=5, continuar=True))
 clicar(aguardar_imagem('img\\seguranca.png'))  # SEGURANÇA
 clicar(aguardar_imagem('img\\usuarios.png'))  # USUÁRIOS
 

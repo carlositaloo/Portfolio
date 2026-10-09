@@ -47,7 +47,7 @@ def selecionar_modo():
 MODO = selecionar_modo()
 
 # Configurações dependentes do modo
-CONFIDENCE   = 0.9  if MODO == 1 else 0.99
+CONFIDENCE   = 0.9
 CANCEL_SLEEP = 0.3  if MODO == 1 else 0.9
 NOME_MODO    = "Manual (com pausa)" if MODO == 1 else "Automático (em lote)"
 
@@ -143,7 +143,7 @@ def executar_automacao():
         print("=" * 50)
 
         # ── Verifica se é EAD antes de qualquer ação ──
-        img7 = aguardar_imagem('img\\07.png', timeout=60, continuar=True)
+        img7 = aguardar_imagem('img\\07.png', timeout=60, continuar=True, confidence=0.99)
         if not img7:
             print("  Disciplina NÃO é EAD (presencial). Pulando...")
             if MODO == 2:

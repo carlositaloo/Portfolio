@@ -1475,3 +1475,29 @@ WHERE STURMADISC.CODTURMA IN (
     'MED_ITAP_11º_T1_'
 )
 ORDER BY STURMADISC.CODTURMA, SDISCIPLINA.NOME;
+
+
+/* ============================================================================
+   CARGOS DO SETOR NTI SISTEMAS
+   Lista os cargos distintos de colaboradores vinculados ao setor NTI Sistemas.
+   Filtra por PSECAO.DESCRICAO LIKE '%NTI%SIST%' — ajuste o padrão se necessário.
+============================================================================ */
+SELECT DISTINCT
+    PSECAO.CODIGO                   AS COD_SETOR,
+    PSECAO.DESCRICAO                AS SETOR,
+    PFUNCAO.CODIGO                  AS COD_CARGO,
+    PFUNCAO.NOME                    AS CARGO,
+    COUNT(PFUNC.CHAPA) OVER (
+        PARTITION BY PFUNCAO.CODIGO
+    )                               AS QTD_COLABORADORES
+FROM PFUNC WITH (NOLOCK)
+JOIN PSECAO WITH (NOLOCK)
+    ON PSECAO.CODCOLIGADA = PFUNC.CODCOLIGADA
+   AND PSECAO.CODIGO      = PFUNC.CODSECAO
+JOIN PFUNCAO WITH (NOLOCK)
+    ON PFUNCAO.CODCOLIGADA = PFUNC.CODCOLIGADA
+   AND PFUNCAO.CODIGO      = PFUNC.CODFUNCAO
+WHERE PFUNC.CODCOLIGADA = 1
+  AND PFUNC.CODSITUACAO  = 'A'
+  AND PSECAO.DESCRICAO  LIKE '%NTI%SIST%'
+ORDER BY PFUNCAO.NOME;

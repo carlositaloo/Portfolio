@@ -8,9 +8,9 @@ import os
 # Configurações iniciais
 timeset = 0.1
 # idatendimento = pyperclip.paste()
-idatendimento = "1564660"
-ticket = "143787"
-etapa = "coordenação do curso"
+idatendimento = "1649575"
+ticket = "170025"
+etapa = "Analise da Coordenação"
 mensagem = f"Solicitação via ticket: {ticket}"
 print(mensagem)
 
@@ -76,7 +76,7 @@ pyautogui.write(idatendimento, interval=0.05)
 img3 = aguardar_imagem('img\\img3.png')
 pyautogui.click(img3, duration=0.15)
 
-img4 = aguardar_imagem('img\\img4.png')
+# img4 = aguardar_imagem('img\\img4.png')
 img5 = aguardar_imagem('img\\img5.png')
 if img5:  # Se achou a imagem
     x, y = pyautogui.center(img5)  # pega o centro

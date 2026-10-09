@@ -1,0 +1,57 @@
+import re
+from playwright.sync_api import Playwright, sync_playwright, expect
+
+
+def run(playwright: Playwright) -> None:
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://fluig.aiamis.com.br/portal/p/01/wcmuserpage")
+    page.get_by_role("textbox", name="Digite seu login").click()
+    page.get_by_role("textbox", name="Digite seu login").fill("automacao.desligamentos")
+    page.get_by_role("textbox", name="Digite seu login").press("Tab")
+    page.get_by_role("textbox", name="Digite sua senha").fill("https://fluig.aiamis.com.br/portal/p/01/wcmuserpage")
+    page.get_by_role("textbox", name="Digite sua senha").press("ControlOrMeta+a")
+    page.get_by_role("textbox", name="Digite sua senha").fill("G0rdinhoM@gro")
+    page.get_by_role("textbox", name="Digite sua senha").press("Enter")
+    page.get_by_role("button", name="Acessar").click()
+    page.get_by_text("Não quero mais ver essas").click()
+    page.get_by_role("button", name="Concluir").click()
+    page.locator("#jqg_wcmid4_1-02574").check()
+    page.get_by_role("link", name="Ativar/Desativar").click()
+    page.get_by_role("button", name="Confirmar").click()
+    page.locator("#jqg_wcmid4_1-02574").check()
+    page.get_by_role("link", name="Ativar/Desativar").click()
+    page.get_by_role("button", name="Confirmar").click()
+    page.get_by_role("textbox", name="Filtrar").click()
+    page.get_by_role("textbox", name="Filtrar").fill("1-02574")
+    page.locator("#jqg_wcmid4_1-02574").check()
+    page.locator("#jqg_wcmid4_1-02574").uncheck()
+    page.get_by_role("textbox", name="Filtrar").click()
+    page.get_by_role("textbox", name="Filtrar").fill("")
+    page.locator("#cb_wcmid4").check()
+    page.locator("#cb_wcmid4").uncheck()
+    page.locator("#jqg_wcmid4_1-02574").check()
+    page.locator("#jqg_wcmid4_1-02574").dblclick()
+    page.locator("#jqg_wcmid4_1-02574").uncheck()
+    page.locator("#jqg_wcmid4_1370233").check()
+    page.locator("#jqg_wcmid4_1370233").uncheck()
+    page.locator("#jqg_wcmid4_1206085").check()
+    page.locator("#jqg_wcmid4_1206085").uncheck()
+    page.locator("#jqg_wcmid4_1-02660").check()
+    page.locator("#jqg_wcmid4_1-02660").uncheck()
+    page.locator("#jqg_wcmid4_1389431").check()
+    page.locator("#jqg_wcmid4_1-02660").check()
+    page.locator("#jqg_wcmid4_1206085").check()
+    page.locator("#jqg_wcmid4_1206085").uncheck()
+    page.locator("#jqg_wcmid4_1-02660").uncheck()
+    page.locator("#jqg_wcmid4_1389431").uncheck()
+    page.get_by_role("listbox").select_option("100")
+
+    # ---------------------
+    context.close()
+    browser.close()
+
+
+with sync_playwright() as playwright:
+    run(playwright)

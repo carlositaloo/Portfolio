@@ -158,7 +158,7 @@ pyautogui.press('enter')
 clicar(aguardar_imagem('img\\ok.png'))
 
 
-link = "https://academico.aiamis.com.br/FrameHTML/web/app/RH/PortalMeuRH/#/login" if colaborador == 'A' else "https://academico.aiamis.com.br/FrameHTML/web/app/edu/portaleducacional/login/"
+link = "https://uninta.vc/portalrh" if colaborador == 'A' else "https://academico.aiamis.com.br/FrameHTML/web/app/edu/portaleducacional/login/"
 
 mensagem = f"""
 A senha do usuário {usuario} {nome} foi redefinida para o CPF do mesmo (somente números). Ao acessar pela primeira vez, será solicitado que altere a senha:

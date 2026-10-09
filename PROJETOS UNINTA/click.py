@@ -98,7 +98,7 @@ def on_click(x, y, button, pressed):
         # Se não é o primeiro evento, calcula o tempo decorrido
         if ultimo_evento is not None:
             tempo_decorrido = tempo_atual - ultimo_evento
-            print(f"time.sleep(timeset)")
+            # print(f"time.sleep(timeset)")
         
         # Identifica qual botão foi clicado
         if str(button) == "Button.left":
