@@ -1,4 +1,5 @@
 pyautogui
+Pillow  # pyautogui usa para ler a tela
 keyboard
 pynput
 openpyxl
