@@ -21,10 +21,10 @@ Quase tudo é em **Python**. O `windows-debloater` é em **PowerShell**.
 
 ## Como rodar
 
-Cada pasta tem seu próprio código. Em geral:
+Cada pasta tem seu `requirements.txt`. Entre na pasta e rode:
 
 ```bash
-pip install -r requirements.txt   # quando a pasta tiver esse arquivo
+pip install -r requirements.txt
 python main.py
 ```
 

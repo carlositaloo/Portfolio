@@ -1,0 +1,6 @@
+pyautogui
+pyperclip
+pynput
+pandas
+openpyxl
+opencv-python  # pyautogui usa para achar imagens com confidence
