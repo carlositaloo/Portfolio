@@ -14,7 +14,6 @@ Quase tudo é em **Python**. O `windows-debloater` é em **PowerShell**.
 | [corretor-ortografia](corretor-ortografia) | Primeira versão do corretor ortográfico com atalho global (LanguageTool). A versão nova está em [corretor-ortografico-ptbr](https://github.com/carlositaloo/corretor-ortografico-ptbr). |
 | [juntar-pdfs](juntar-pdfs) | Junta vários PDFs em um só arquivo, sem o limite dos sites online. |
 | [leitor-gabaritos](leitor-gabaritos) | Leitura de gabaritos por imagem para correção de provas. *Projeto incompleto* (versões 1 e 2). |
-| [manipulacao-planilhas](manipulacao-planilhas) | Scripts para limpar e cruzar dados de planilhas Excel. |
 | [mapa-notas-sige](mapa-notas-sige) | Passa notas de uma planilha Excel para o SIGE (sistema do estado do Ceará). |
 | [scangrader](scangrader) | Gera IDs de alunos e corrige resultados de provas a partir de planilhas. |
 | [transferencia-notas](transferencia-notas) | Copia as notas do SIGE para um documento Word na ordem certa. |
