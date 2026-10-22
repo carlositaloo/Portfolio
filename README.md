@@ -2,7 +2,7 @@
 
 Olá! Sou Carlos Ítalo. Aqui estão projetos que criei para resolver problemas reais do dia a dia, a maioria no trabalho em escola: automações, ferramentas de escritório e utilitários para Windows.
 
-Quase tudo é em **Python**. O `windows-debloater` é em **PowerShell**.
+Quase tudo é em **Python**. O Windows-Debloater é em **PowerShell** e tem repositório próprio.
 
 ## Projetos
 
@@ -17,7 +17,7 @@ Quase tudo é em **Python**. O `windows-debloater` é em **PowerShell**.
 | [mapa-notas-sige](mapa-notas-sige) | Passa notas de uma planilha Excel para o SIGE (sistema do estado do Ceará). |
 | [scangrader](scangrader) | Gera IDs de alunos e corrige resultados de provas a partir de planilhas. |
 | [transferencia-notas](transferencia-notas) | Copia as notas do SIGE para um documento Word na ordem certa. |
-| [windows-debloater](windows-debloater) | Script PowerShell que remove apps inúteis, desativa telemetria e deixa o Windows mais leve. |
+| [Windows-Debloater](https://github.com/carlositaloo/Windows-Debloater) ↗ | Script PowerShell que remove apps inúteis, desativa telemetria e deixa o Windows mais leve. *Repositório próprio.* |
 
 ## Como rodar
 
