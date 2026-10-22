@@ -1,0 +1,10 @@
+# Cache do Python (volta toda vez que roda)
+__pycache__/
+*.pyc
+
+# Saida gerada pelo pdf.py
+PDF Final.pdf
+
+# Programas prontos (.exe) ficam nas Releases do GitHub
+dist/
+build/
