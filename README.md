@@ -8,10 +8,10 @@ Quase tudo é em **Python**. O Windows-Debloater é em **PowerShell** e tem repo
 
 | Projeto | O que faz |
 |---|---|
-| [atalhos-teclado](atalhos-teclado) | Atalhos de teclado personalizados para abrir programas e agilizar tarefas. [Baixar .exe](https://github.com/carlositaloo/Portfolio/releases/tag/atalhos-v1.0) |
+| [TurboAtalho](https://github.com/carlositaloo/TurboAtalho) ↗ | Atalhos de teclado: aperte uma tecla 2 vezes para abrir programas e agilizar tarefas. *Repositório próprio.* |
 | [automacao-canva](automacao-canva) | Insere nomes de uma planilha Excel em artes do Canva, para gerar certificados em massa. |
 | [converter-imagens](converter-imagens) | Converte fotos HEIC (iPhone) para PNG ou JPEG em lote. Usado em mais de 1500 fotos. [Baixar .exe](https://github.com/carlositaloo/Portfolio/releases/tag/converter-heic-v1.0) |
-| [corretor-ortografia](corretor-ortografia) | Primeira versão do corretor ortográfico com atalho global (LanguageTool). A versão nova está em [corretor-ortografico-ptbr](https://github.com/carlositaloo/corretor-ortografico-ptbr). |
+| [corretor-ortografico-ptbr](https://github.com/carlositaloo/corretor-ortografico-ptbr) ↗ | Corretor ortográfico com IA local para português, com atalho global. *Repositório próprio.* |
 | [juntar-pdfs](juntar-pdfs) | Junta vários PDFs em um só arquivo, sem o limite dos sites online. |
 | [leitor-gabaritos](leitor-gabaritos) | Leitura de gabaritos por imagem para correção de provas. *Projeto incompleto* (versões 1 e 2). |
 | [mapa-notas-sige](mapa-notas-sige) | Passa notas de uma planilha Excel para o SIGE (sistema do estado do Ceará). |
